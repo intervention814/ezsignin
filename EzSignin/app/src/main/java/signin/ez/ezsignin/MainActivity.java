@@ -13,21 +13,43 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+import android.widget.TextView;
 
+import java.text.Format;
+import java.text.NumberFormat;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
     private final static String TAG = "MainActivity";
+    private final int NUM_RATES = 4;
     private boolean mIsAdapterSetSelectionLanguage = true;
     private final String KEY_LANG = "KEY_LANG";
     private final String VALUE_LANG_SPANISH = "VALUE_LANG_SPANISH";
     private final String VALUE_LANG_ENGLISH = "VALUE_LANG_ENGLISH";
 
+    /* Income table default configuration [# in household][rate] */
+    private HashMap<Integer, List<Integer>> mIncomes;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mIncomes = new HashMap<>();
+        mIncomes.put(1, Arrays.asList(20000, 2000, 350, 75));
+        mIncomes.put(2, Arrays.asList(30000, 3000, 450, 95));
+        mIncomes.put(3, Arrays.asList(40000, 4000, 550, 105));
+        mIncomes.put(4, Arrays.asList(50000, 5000, 650, 115));
+        mIncomes.put(5, Arrays.asList(60000, 6000, 750, 125));
+        mIncomes.put(6, Arrays.asList(70000, 7000, 850, 135));
+        mIncomes.put(7, Arrays.asList(80000, 8000, 950, 145));
+        mIncomes.put(8, Arrays.asList(90000, 9000, 1050, 155));
+        mIncomes.put(9, Arrays.asList(100000, 10000, 1150, 165));
+        mIncomes.put(10, Arrays.asList(110000, 11000, 1250, 175));
 
         /* Configure the spinnerLanguage */
         Spinner spinnerLanguage = (Spinner)findViewById(R.id.spinnerLanguage);
@@ -59,7 +81,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         return super.onOptionsItemSelected(item);
     }
 
-    /* Handle language spinner selections */
+    /**
+     * Handle spinner changes
+     * @param parent
+     * @param view
+     * @param pos
+     * @param id
+     */
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
         Log.v(TAG, "onItemSelected" + pos);
@@ -88,10 +116,16 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 break;
             case R.id.spinnerNumHousehold:
                 Log.v(TAG, "Household: " + (pos + 1));
+                this.updateIncomeTable(pos + 1);
                 break;
         }
     }
 
+    /**
+     * Handle nothing selected
+     * @param parent
+     */
+    @Override
     public void onNothingSelected(AdapterView<?> parent) {
         // Another interface callback
         Log.v(TAG, "onNothingSelected");
@@ -146,6 +180,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         spinnerLanguage.setOnItemSelectedListener(this);
     }
 
+    /** Configure the household spinner.
+     *
+     * @param spinnerHousehold the household spinner
+     */
     private void configureHouseholdSpinner(Spinner spinnerHousehold) {
         String[] array = getResources().getStringArray(R.array.household_array);
         Integer[] householdInts = new Integer[array.length];
@@ -160,5 +198,29 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
         spinnerHousehold.setAdapter(adapter);
         spinnerHousehold.setOnItemSelectedListener(this);
+    }
+
+    /**
+     * Update the table for minimum incomes.
+     * @param numInHousehold the number of people in the household.
+     */
+    private void updateIncomeTable(int numInHousehold) {
+        TextView incomeAnnual = (TextView)findViewById(R.id.incomeTableIncomeAnnual);
+        TextView incomeMonthly = (TextView)findViewById(R.id.incomeTableIncomeMonthly);
+        TextView incomeWeek = (TextView)findViewById(R.id.incomeTableIncomeWeek);
+        TextView incomeDay = (TextView)findViewById(R.id.incomeTableIncomeDay);
+
+        List<Integer> incomeList = mIncomes.get(numInHousehold);
+        if (incomeList == null && incomeList.size() < NUM_RATES) {
+            Log.v(TAG, "Unable to get income list for household size " + numInHousehold);
+            return;
+        }
+
+        Format formatter = NumberFormat.getCurrencyInstance();
+
+        incomeAnnual.setText(formatter.format(incomeList.get(0)));
+        incomeMonthly.setText(formatter.format(incomeList.get(1)));
+        incomeWeek.setText(formatter.format(incomeList.get(2)));
+        incomeDay.setText(formatter.format(incomeList.get(3)));
     }
 }

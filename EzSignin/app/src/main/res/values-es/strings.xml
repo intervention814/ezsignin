@@ -1,6 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="prompt_name">Nombre</string>
+    <string name="num_people_household"># Personas en el Hogar</string>
+    <string name="income_annual">Anual</string>
+    <string name="income_monthly">Mensual</string>
+    <string name="income_weekly">Cada semana</string>
+    <string name="income_daily">Diariamente</string>
+    <string name="income_eligibility">Elegibilidad de ingresos</string>
+    <string name="food_stamps">Cupones de alimentos</string>
+    <string name="tanf">Asistencia temporal para familias necesitadas</string>
+    <string name="ssi">Seguridad Social</string>
+    <string name="medicaid">Medicaid</string>
+    <string name="county">Condado</string>
+    <string name="address">Dirección</string>
 
     <string-array name="languages_array">
         <item>English</item>
