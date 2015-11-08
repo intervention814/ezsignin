@@ -13,6 +13,8 @@
     <string name="medicaid">Medicaid</string>
     <string name="county">Condado</string>
     <string name="address">Dirección</string>
+    <string name="save">Guardar</string>
+
 
     <string-array name="languages_array">
         <item>English</item>

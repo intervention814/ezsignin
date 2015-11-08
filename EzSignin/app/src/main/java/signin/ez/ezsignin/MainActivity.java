@@ -1,8 +1,10 @@
 package signin.ez.ezsignin;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -30,6 +32,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private final String KEY_LANG = "KEY_LANG";
     private final String VALUE_LANG_SPANISH = "VALUE_LANG_SPANISH";
     private final String VALUE_LANG_ENGLISH = "VALUE_LANG_ENGLISH";
+    private String mEmail = "";
 
     /* Income table default configuration [# in household][rate] */
     private HashMap<Integer, List<Integer>> mIncomes;
@@ -37,7 +40,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
+
+        /* Retreive the cached email */
+        mEmail = this.getPreferenceByKey(SettingsActivity.KEY_PREF_EMAIL);
 
         mIncomes = new HashMap<>();
         mIncomes.put(1, Arrays.asList(20000, 2000, 350, 75));
@@ -75,6 +82,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            Intent settingsActivityIntent = new Intent(this, SettingsActivity.class);
+            startActivity(settingsActivityIntent);
             return true;
         }
 
@@ -222,5 +231,29 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         incomeMonthly.setText(formatter.format(incomeList.get(1)));
         incomeWeek.setText(formatter.format(incomeList.get(2)));
         incomeDay.setText(formatter.format(incomeList.get(3)));
+    }
+
+    /**
+     * Handles save button press.
+     * @param view
+     */
+    public void onSaveClick(View view) {
+        Log.v(TAG, "Saving!");
+    }
+
+    /**
+     * Get the preferences from settings activity
+     */
+    private String getPreferenceByKey(String key) {
+        String ret = null;
+        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        try {
+            ret = sharedPref.getString(key, "");
+        } catch (NumberFormatException nfe) {
+            Log.v(TAG, nfe.getMessage());
+        }
+
+        return ret;
     }
 }
