@@ -2,8 +2,10 @@ package signin.ez.ezsignin;
 
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -18,6 +20,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     private final static String TAG = "MainActivity";
     private boolean mIsAdapterSetSelection = true;
+    private final String KEY_LANG = "KEY_LANG";
+    private final String VALUE_LANG_SPANISH = "VALUE_LANG_SPANISH";
+    private final String VALUE_LANG_ENGLISH = "VALUE_LANG_ENGLISH";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +39,20 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
         spinner.setAdapter(adapter);
+
+        /* Handle language change */
+
+        Intent intent = getIntent();
+        String languange = intent.getStringExtra(KEY_LANG);
+        if (languange != null && languange.compareTo(VALUE_LANG_ENGLISH) == 0) {
+            Log.v(TAG, "Switched to ENGLISH");
+            spinner.setSelection(0);
+        }
+        if (languange != null && languange.compareTo(VALUE_LANG_SPANISH) == 0) {
+            Log.v(TAG, "Switched to SPANISH");
+            spinner.setSelection(1);
+        }
+
 
         spinner.setOnItemSelectedListener(this);
     }
@@ -75,18 +94,31 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         if (pos == 0) {
             /* English */
             Log.v(TAG, "English");
-            refresh();
+            Locale myLocale = new Locale("en");
+            Resources res = getResources();
+            DisplayMetrics dm = res.getDisplayMetrics();
+            Configuration conf = res.getConfiguration();
+            conf.locale = myLocale;
+            res.updateConfiguration(conf, dm);
+            refresh(VALUE_LANG_ENGLISH);
         }
         if (pos == 1) {
             /* Spanish */
             Log.v(TAG, "Spanish");
-            refresh();
+            Locale myLocale = new Locale("es");
+            Resources res = getResources();
+            DisplayMetrics dm = res.getDisplayMetrics();
+            Configuration conf = res.getConfiguration();
+            conf.locale = myLocale;
+            res.updateConfiguration(conf, dm);
+            refresh(VALUE_LANG_SPANISH);
         }
     }
 
-    private void refresh() {
+    private void refresh(String language) {
         Intent refresh = getIntent();
         finish();
+        refresh.putExtra(KEY_LANG, language);
         startActivity(refresh);
     }
 
