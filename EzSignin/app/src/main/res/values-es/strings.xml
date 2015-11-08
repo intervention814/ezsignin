@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="prompt_name">Nombre</string>
+
+    <string-array name="languages_array">
+        <item>English</item>
+        <item>Spanish</item>
+    </string-array>
+</resources>
