@@ -17,6 +17,7 @@ import java.util.Locale;
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
     private final static String TAG = "MainActivity";
+    private boolean mIsAdapterSetSelection = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,14 +65,29 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
         Log.v(TAG, "onItemSelected" + pos);
 
+        /* Don't respond to adapter setting selections */
+        if (mIsAdapterSetSelection) {
+            mIsAdapterSetSelection = false;
+            Log.v(TAG, "Adapter set selection!");
+            return;
+        }
+
         if (pos == 0) {
             /* English */
             Log.v(TAG, "English");
+            refresh();
         }
         if (pos == 1) {
             /* Spanish */
             Log.v(TAG, "Spanish");
+            refresh();
         }
+    }
+
+    private void refresh() {
+        Intent refresh = getIntent();
+        finish();
+        startActivity(refresh);
     }
 
     public void onNothingSelected(AdapterView<?> parent) {
