@@ -19,7 +19,7 @@ import java.util.Locale;
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
     private final static String TAG = "MainActivity";
-    private boolean mIsAdapterSetSelection = true;
+    private boolean mIsAdapterSetSelectionLanguage = true;
     private final String KEY_LANG = "KEY_LANG";
     private final String VALUE_LANG_SPANISH = "VALUE_LANG_SPANISH";
     private final String VALUE_LANG_ENGLISH = "VALUE_LANG_ENGLISH";
@@ -29,32 +29,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        /* Configure the spinner */
-        Spinner spinner = (Spinner)findViewById(R.id.spinnerLanguage);
+        /* Configure the spinnerLanguage */
+        Spinner spinnerLanguage = (Spinner)findViewById(R.id.spinnerLanguage);
+        Spinner spinnerHousehold = (Spinner)findViewById(R.id.spinnerNumHousehold);
 
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-                R.array.languages_array, android.R.layout.simple_spinner_item);
-
-
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-        spinner.setAdapter(adapter);
-
-        /* Handle language change */
-
-        Intent intent = getIntent();
-        String languange = intent.getStringExtra(KEY_LANG);
-        if (languange != null && languange.compareTo(VALUE_LANG_ENGLISH) == 0) {
-            Log.v(TAG, "Switched to ENGLISH");
-            spinner.setSelection(0);
-        }
-        if (languange != null && languange.compareTo(VALUE_LANG_SPANISH) == 0) {
-            Log.v(TAG, "Switched to SPANISH");
-            spinner.setSelection(1);
-        }
-
-
-        spinner.setOnItemSelectedListener(this);
+        this.configureLanguageSpinner(spinnerLanguage);
+        this.configureHouseholdSpinner(spinnerHousehold);
     }
 
     @Override
@@ -84,37 +64,58 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
         Log.v(TAG, "onItemSelected" + pos);
 
-        /* Don't respond to adapter setting selections */
-        if (mIsAdapterSetSelection) {
-            mIsAdapterSetSelection = false;
-            Log.v(TAG, "Adapter set selection!");
-            return;
-        }
-
-        if (pos == 0) {
-            /* English */
-            Log.v(TAG, "English");
-            Locale myLocale = new Locale("en");
-            Resources res = getResources();
-            DisplayMetrics dm = res.getDisplayMetrics();
-            Configuration conf = res.getConfiguration();
-            conf.locale = myLocale;
-            res.updateConfiguration(conf, dm);
-            refresh(VALUE_LANG_ENGLISH);
-        }
-        if (pos == 1) {
-            /* Spanish */
-            Log.v(TAG, "Spanish");
-            Locale myLocale = new Locale("es");
-            Resources res = getResources();
-            DisplayMetrics dm = res.getDisplayMetrics();
-            Configuration conf = res.getConfiguration();
-            conf.locale = myLocale;
-            res.updateConfiguration(conf, dm);
-            refresh(VALUE_LANG_SPANISH);
+        Spinner spinner = (Spinner)parent;
+        switch (spinner.getId()) {
+            case R.id.spinnerLanguage:
+                /* Don't respond to adapter setting selections */
+                if (mIsAdapterSetSelectionLanguage) {
+                    mIsAdapterSetSelectionLanguage = false;
+                    Log.v(TAG, "Adapter set selection!");
+                    return;
+                }
+                if (pos == 0) {
+                /* English */
+                    Log.v(TAG, "English");
+                    this.setLanguage("en");
+                    refresh(VALUE_LANG_ENGLISH);
+                }
+                if (pos == 1) {
+                /* Spanish */
+                    Log.v(TAG, "Spanish");
+                    this.setLanguage("es");
+                    refresh(VALUE_LANG_SPANISH);
+                }
+                break;
+            case R.id.spinnerNumHousehold:
+                Log.v(TAG, "Household: " + (pos + 1));
+                break;
         }
     }
 
+    public void onNothingSelected(AdapterView<?> parent) {
+        // Another interface callback
+        Log.v(TAG, "onNothingSelected");
+    }
+
+    /* Custom methods */
+
+    /**
+     * Set the locale to language
+     * @param language the language code to set
+     */
+    private void setLanguage(String language) {
+        Locale myLocale = new Locale(language);
+        Resources res = getResources();
+        DisplayMetrics dm = res.getDisplayMetrics();
+        Configuration conf = res.getConfiguration();
+        conf.locale = myLocale;
+        res.updateConfiguration(conf, dm);
+    }
+
+    /**
+     * Refresh this activity
+     * @param language the language that is should start in
+     */
     private void refresh(String language) {
         Intent refresh = getIntent();
         finish();
@@ -122,8 +123,42 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         startActivity(refresh);
     }
 
-    public void onNothingSelected(AdapterView<?> parent) {
-        // Another interface callback
-        Log.v(TAG, "onNothingSelected");
+    /**
+     * Configure the language spinner
+     * @param spinnerLanguage the language spinner
+     */
+    private void configureLanguageSpinner(Spinner spinnerLanguage) {
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.languages_array, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        spinnerLanguage.setAdapter(adapter);
+
+        /* Handle language change */
+        Intent intent = getIntent();
+        String languange = intent.getStringExtra(KEY_LANG);
+        if (languange != null && languange.compareTo(VALUE_LANG_ENGLISH) == 0) {
+            spinnerLanguage.setSelection(0);
+        }
+        if (languange != null && languange.compareTo(VALUE_LANG_SPANISH) == 0) {
+            spinnerLanguage.setSelection(1);
+        }
+        spinnerLanguage.setOnItemSelectedListener(this);
+    }
+
+    private void configureHouseholdSpinner(Spinner spinnerHousehold) {
+        String[] array = getResources().getStringArray(R.array.household_array);
+        Integer[] householdInts = new Integer[array.length];
+        for(int i = 0; i < array.length; i++) {
+            householdInts[i] = Integer.parseInt(array[i]);
+        }
+        ArrayAdapter<Integer> adapter = new ArrayAdapter<Integer>(this,android.R.layout.simple_spinner_item, householdInts);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        if (adapter == null) {
+            Log.v(TAG, "Adapter is null!");
+            return;
+        }
+        spinnerHousehold.setAdapter(adapter);
+        spinnerHousehold.setOnItemSelectedListener(this);
     }
 }
