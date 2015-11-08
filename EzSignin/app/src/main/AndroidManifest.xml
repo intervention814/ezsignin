@@ -16,7 +16,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".SettingsActivity"
             android:label="Settings"
@@ -24,6 +23,14 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="signin.ez.ezsignin.MainActivity" />
+        </activity>
+        <activity
+            android:name=".ConfigureIncomeTableActivity"
+            android:label="@string/title_activity_configure_income_table" >
+            <intent-filter>
+                <action android:name="signin.ez.ezsignin.ConfigureIncomeTableActivity" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
         </activity>
     </application>
 

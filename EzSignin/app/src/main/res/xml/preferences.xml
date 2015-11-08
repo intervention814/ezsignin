@@ -7,4 +7,8 @@
         android:defaultValue=""
         android:inputType="textEmailAddress"
         android:dialogTitle="Send results to this address" />
+
+    <Preference android:title="Edit Income Table" >
+        <intent android:action="signin.ez.ezsignin.ConfigureIncomeTableActivity" />
+    </Preference>
 </PreferenceScreen>

@@ -55,8 +55,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/spinnerNumHousehold"
-        android:layout_below="@+id/textViewNumPeoplePerHousehold"
-        android:layout_alignParentStart="true" />
+        android:layout_alignTop="@+id/textViewNumPeoplePerHousehold"
+        android:layout_toEndOf="@+id/textViewNumPeoplePerHousehold" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -64,8 +64,8 @@
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="@string/num_people_household"
         android:id="@+id/textViewNumPeoplePerHousehold"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/editTextCounty" />
+        android:layout_below="@+id/editTextCounty"
+        android:layout_alignParentStart="true" />
 
     <TableLayout
         android:id="@+id/tableLayoutIncome"
@@ -79,19 +79,23 @@
             android:gravity="center_horizontal">
             <TextView
                 android:text="@string/income_annual"
-                android:padding="3dip" />
+                android:padding="3dip"
+                android:textStyle="bold" />
             <TextView
                 android:text="@string/income_monthly"
                 android:gravity="right"
-                android:padding="3dip" />
+                android:padding="3dip"
+                android:textStyle="bold" />
             <TextView
                 android:text="@string/income_weekly"
                 android:gravity="right"
-                android:padding="3dip" />
+                android:padding="3dip"
+                android:textStyle="bold" />
             <TextView
                 android:text="@string/income_daily"
                 android:gravity="right"
-                android:padding="3dip" />
+                android:padding="3dip"
+                android:textStyle="bold" />
         </TableRow>
 
         <TableRow

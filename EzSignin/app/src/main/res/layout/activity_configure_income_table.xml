@@ -1,0 +1,365 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    tools:context="signin.ez.ezsignin.ConfigureIncomeTableActivity">
+
+    <TableLayout
+        android:id="@+id/tableLayoutIncome"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/spinnerNumHousehold"
+        android:layout_alignParentStart="true"
+        android:gravity="center_horizontal|end"
+        android:layout_alignParentEnd="true">
+        <TableRow
+            android:gravity="center_horizontal">
+            <TextView
+                android:text="Household Size"
+                android:padding="3dip"
+                android:textStyle="bold" />
+            <TextView
+                android:text="@string/income_annual"
+                android:padding="3dip"
+                android:textStyle="bold" />
+            <TextView
+                android:text="@string/income_monthly"
+                android:gravity="right"
+                android:padding="3dip"
+                android:textStyle="bold" />
+            <TextView
+                android:text="@string/income_weekly"
+                android:gravity="right"
+                android:padding="3dip"
+                android:textStyle="bold" />
+            <TextView
+                android:text="@string/income_daily"
+                android:gravity="right"
+                android:padding="3dip"
+                android:textStyle="bold" />
+        </TableRow>
+
+        <TableRow
+            android:gravity="center_horizontal">
+            <TextView
+                android:id="@+id/incomeTableIncomeAnnualConfigHHLabel1"
+                android:text="1"
+                android:inputType="number"
+                android:padding="3dip" />
+            <EditText
+                android:id="@+id/incomeTableIncomeAnnualConfig1"
+                android:text="20,000"
+                android:inputType="number"
+                android:padding="3dip" />
+            <EditText
+                android:id="@+id/incomeTableIncomeMonthlyConfig1"
+                android:text="1,000"
+                android:inputType="number"
+                android:gravity="right"
+                android:padding="3dip" />
+            <EditText
+                android:id="@+id/incomeTableIncomeWeekConfig1"
+                android:text="350"
+                android:inputType="number"
+                android:gravity="right"
+                android:padding="3dip" />
+            <EditText
+                android:id="@+id/incomeTableIncomeDayConfig1"
+                android:text="75"
+                android:inputType="number"
+                android:gravity="right"
+                android:padding="3dip" />
+        </TableRow>
+        <TableRow
+            android:gravity="center_horizontal">
+            <TextView
+                android:id="@+id/incomeTableIncomeAnnualConfigHHLabel2"
+                android:text="2"
+                android:inputType="number"
+                android:padding="3dip" />
+            <EditText
+                android:id="@+id/incomeTableIncomeAnnualConfig2"
+                android:text="20,000"
+                android:inputType="number"
+                android:padding="3dip" />
+            <EditText
+                android:id="@+id/incomeTableIncomeMonthlyConfig2"
+                android:text="1,000"
+                android:inputType="number"
+                android:gravity="right"
+                android:padding="3dip" />
+            <EditText
+                android:id="@+id/incomeTableIncomeWeekConfig2"
+                android:text="350"
+                android:inputType="number"
+                android:gravity="right"
+                android:padding="3dip" />
+            <EditText
+                android:id="@+id/incomeTableIncomeDayConfig2"
+                android:text="75"
+                android:inputType="number"
+                android:gravity="right"
+                android:padding="3dip" />
+        </TableRow>
+        <TableRow
+            android:gravity="center_horizontal">
+            <TextView
+                android:id="@+id/incomeTableIncomeAnnualConfigHHLabel3"
+                android:text="3"
+                android:inputType="number"
+                android:padding="3dip" />
+            <EditText
+                android:id="@+id/incomeTableIncomeAnnualConfig3"
+                android:text="20,000"
+                android:inputType="number"
+                android:padding="3dip" />
+            <EditText
+                android:id="@+id/incomeTableIncomeMonthlyConfig3"
+                android:text="1,000"
+                android:inputType="number"
+                android:gravity="right"
+                android:padding="3dip" />
+            <EditText
+                android:id="@+id/incomeTableIncomeWeekConfig3"
+                android:text="350"
+                android:inputType="number"
+                android:gravity="right"
+                android:padding="3dip" />
+            <EditText
+                android:id="@+id/incomeTableIncomeDayConfig3"
+                android:text="75"
+                android:inputType="number"
+                android:gravity="right"
+                android:padding="3dip" />
+        </TableRow>
+        <TableRow
+            android:gravity="center_horizontal">
+            <TextView
+                android:id="@+id/incomeTableIncomeAnnualConfigHHLabel4"
+                android:text="4"
+                android:inputType="number"
+                android:padding="3dip" />
+            <EditText
+                android:id="@+id/incomeTableIncomeAnnualConfig4"
+                android:text="20,000"
+                android:inputType="number"
+                android:padding="3dip" />
+            <EditText
+                android:id="@+id/incomeTableIncomeMonthlyConfig4"
+                android:text="1,000"
+                android:inputType="number"
+                android:gravity="right"
+                android:padding="3dip" />
+            <EditText
+                android:id="@+id/incomeTableIncomeWeekConfig4"
+                android:text="350"
+                android:inputType="number"
+                android:gravity="right"
+                android:padding="3dip" />
+            <EditText
+                android:id="@+id/incomeTableIncomeDayConfig4"
+                android:text="75"
+                android:inputType="number"
+                android:gravity="right"
+                android:padding="3dip" />
+        </TableRow>
+        <TableRow
+            android:gravity="center_horizontal">
+            <TextView
+                android:id="@+id/incomeTableIncomeAnnualConfigHHLabel5"
+                android:text="5"
+                android:inputType="number"
+                android:padding="3dip" />
+            <EditText
+                android:id="@+id/incomeTableIncomeAnnualConfig5"
+                android:text="20,000"
+                android:inputType="number"
+                android:padding="3dip" />
+            <EditText
+                android:id="@+id/incomeTableIncomeMonthlyConfig5"
+                android:text="1,000"
+                android:inputType="number"
+                android:gravity="right"
+                android:padding="3dip" />
+            <EditText
+                android:id="@+id/incomeTableIncomeWeekConfig5"
+                android:text="350"
+                android:inputType="number"
+                android:gravity="right"
+                android:padding="3dip" />
+            <EditText
+                android:id="@+id/incomeTableIncomeDayConfig5"
+                android:text="75"
+                android:inputType="number"
+                android:gravity="right"
+                android:padding="3dip" />
+        </TableRow>
+        <TableRow
+            android:gravity="center_horizontal">
+            <TextView
+                android:id="@+id/incomeTableIncomeAnnualConfigHHLabel6"
+                android:text="6"
+                android:inputType="number"
+                android:padding="3dip" />
+            <EditText
+                android:id="@+id/incomeTableIncomeAnnualConfig6"
+                android:text="20,000"
+                android:inputType="number"
+                android:padding="3dip" />
+            <EditText
+                android:id="@+id/incomeTableIncomeMonthlyConfig6"
+                android:text="1,000"
+                android:inputType="number"
+                android:gravity="right"
+                android:padding="3dip" />
+            <EditText
+                android:id="@+id/incomeTableIncomeWeekConfig6"
+                android:text="350"
+                android:inputType="number"
+                android:gravity="right"
+                android:padding="3dip" />
+            <EditText
+                android:id="@+id/incomeTableIncomeDayConfig6"
+                android:text="75"
+                android:inputType="number"
+                android:gravity="right"
+                android:padding="3dip" />
+        </TableRow>
+        <TableRow
+            android:gravity="center_horizontal">
+            <TextView
+                android:id="@+id/incomeTableIncomeAnnualConfigHHLabel7"
+                android:text="7"
+                android:inputType="number"
+                android:padding="3dip" />
+            <EditText
+                android:id="@+id/incomeTableIncomeAnnualConfig7"
+                android:text="20,000"
+                android:inputType="number"
+                android:padding="3dip" />
+            <EditText
+                android:id="@+id/incomeTableIncomeMonthlyConfig7"
+                android:text="1,000"
+                android:inputType="number"
+                android:gravity="right"
+                android:padding="3dip" />
+            <EditText
+                android:id="@+id/incomeTableIncomeWeekConfig7"
+                android:text="350"
+                android:inputType="number"
+                android:gravity="right"
+                android:padding="3dip" />
+            <EditText
+                android:id="@+id/incomeTableIncomeDayConfig7"
+                android:text="75"
+                android:inputType="number"
+                android:gravity="right"
+                android:padding="3dip" />
+        </TableRow>
+        <TableRow
+            android:gravity="center_horizontal">
+            <TextView
+                android:id="@+id/incomeTableIncomeAnnualConfigHHLabel8"
+                android:text="8"
+                android:inputType="number"
+                android:padding="3dip" />
+            <EditText
+                android:id="@+id/incomeTableIncomeAnnualConfig8"
+                android:text="20,000"
+                android:inputType="number"
+                android:padding="3dip" />
+            <EditText
+                android:id="@+id/incomeTableIncomeMonthlyConfig8"
+                android:text="1,000"
+                android:inputType="number"
+                android:gravity="right"
+                android:padding="3dip" />
+            <EditText
+                android:id="@+id/incomeTableIncomeWeekConfig8"
+                android:text="350"
+                android:inputType="number"
+                android:gravity="right"
+                android:padding="3dip" />
+            <EditText
+                android:id="@+id/incomeTableIncomeDayConfig8"
+                android:text="75"
+                android:inputType="number"
+                android:gravity="right"
+                android:padding="3dip" />
+        </TableRow>
+        <TableRow
+            android:gravity="center_horizontal">
+            <TextView
+                android:id="@+id/incomeTableIncomeAnnualConfigHHLabel9"
+                android:text="9"
+                android:inputType="number"
+                android:padding="3dip" />
+            <EditText
+                android:id="@+id/incomeTableIncomeAnnualConfig9"
+                android:text="20,000"
+                android:inputType="number"
+                android:padding="3dip" />
+            <EditText
+                android:id="@+id/incomeTableIncomeMonthlyConfig9"
+                android:text="1,000"
+                android:inputType="number"
+                android:gravity="right"
+                android:padding="3dip" />
+            <EditText
+                android:id="@+id/incomeTableIncomeWeekConfig9"
+                android:text="350"
+                android:inputType="number"
+                android:gravity="right"
+                android:padding="3dip" />
+            <EditText
+                android:id="@+id/incomeTableIncomeDayConfig9"
+                android:text="75"
+                android:inputType="number"
+                android:gravity="right"
+                android:padding="3dip" />
+        </TableRow>
+        <TableRow
+            android:gravity="center_horizontal">
+            <TextView
+                android:id="@+id/incomeTableIncomeAnnualConfigHHLabel10"
+                android:text="10"
+                android:inputType="number"
+                android:padding="3dip" />
+            <EditText
+                android:id="@+id/incomeTableIncomeAnnualConfig10"
+                android:text="20,000"
+                android:inputType="number"
+                android:padding="3dip" />
+            <EditText
+                android:id="@+id/incomeTableIncomeMonthlyConfig10"
+                android:text="1,000"
+                android:inputType="number"
+                android:gravity="right"
+                android:padding="3dip" />
+            <EditText
+                android:id="@+id/incomeTableIncomeWeekConfig10"
+                android:text="350"
+                android:inputType="number"
+                android:gravity="right"
+                android:padding="3dip" />
+            <EditText
+                android:id="@+id/incomeTableIncomeDayConfig10"
+                android:text="75"
+                android:inputType="number"
+                android:gravity="right"
+                android:padding="3dip" />
+        </TableRow>
+
+    </TableLayout>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="onIncomeTableSaveClick"
+        android:text="@string/save"
+        android:layout_alignParentBottom="true">
+    </Button>
+
+</RelativeLayout>

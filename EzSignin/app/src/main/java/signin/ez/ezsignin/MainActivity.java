@@ -17,6 +17,8 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
+
 import java.text.Format;
 import java.text.NumberFormat;
 import java.util.Arrays;
@@ -25,6 +27,9 @@ import java.util.List;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
+
+    public final static String KEY_INCOME_CONFIG = "KEY_INCOME_CONFIG";
+    public final static String KEY_PREF_INCOME_TABLE = "KEY_PREF_INCOME_TABLE";
 
     private final static String TAG = "MainActivity";
     private final int NUM_RATES = 4;
@@ -46,17 +51,29 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         /* Retreive the cached email */
         mEmail = this.getPreferenceByKey(SettingsActivity.KEY_PREF_EMAIL);
 
-        mIncomes = new HashMap<>();
-        mIncomes.put(1, Arrays.asList(20000, 2000, 350, 75));
-        mIncomes.put(2, Arrays.asList(30000, 3000, 450, 95));
-        mIncomes.put(3, Arrays.asList(40000, 4000, 550, 105));
-        mIncomes.put(4, Arrays.asList(50000, 5000, 650, 115));
-        mIncomes.put(5, Arrays.asList(60000, 6000, 750, 125));
-        mIncomes.put(6, Arrays.asList(70000, 7000, 850, 135));
-        mIncomes.put(7, Arrays.asList(80000, 8000, 950, 145));
-        mIncomes.put(8, Arrays.asList(90000, 9000, 1050, 155));
-        mIncomes.put(9, Arrays.asList(100000, 10000, 1150, 165));
-        mIncomes.put(10, Arrays.asList(110000, 11000, 1250, 175));
+        String incomeTable = this.getPreferenceByKey(MainActivity.KEY_PREF_INCOME_TABLE);
+        if (incomeTable != null) {
+            Log.v(TAG, "Attempting to use new income table!");
+            Gson gson = new Gson();
+            HashMapWrapper wrapper = gson.fromJson(incomeTable, HashMapWrapper.class);
+            mIncomes = wrapper.hashMap;
+            if (mIncomes == null) {
+                throw new IllegalStateException("Income map not retreived from GSON object!");
+            }
+        } else {
+            Log.v(TAG, "Using default incomes!");
+            mIncomes = new HashMap<>();
+            mIncomes.put(1, Arrays.asList(20000, 2000, 350, 75));
+            mIncomes.put(2, Arrays.asList(30000, 3000, 450, 95));
+            mIncomes.put(3, Arrays.asList(40000, 4000, 550, 105));
+            mIncomes.put(4, Arrays.asList(50000, 5000, 650, 115));
+            mIncomes.put(5, Arrays.asList(60000, 6000, 750, 125));
+            mIncomes.put(6, Arrays.asList(70000, 7000, 850, 135));
+            mIncomes.put(7, Arrays.asList(80000, 8000, 950, 145));
+            mIncomes.put(8, Arrays.asList(90000, 9000, 1050, 155));
+            mIncomes.put(9, Arrays.asList(100000, 10000, 1150, 165));
+            mIncomes.put(10, Arrays.asList(110000, 11000, 1250, 175));
+        }
 
         /* Configure the spinnerLanguage */
         Spinner spinnerLanguage = (Spinner)findViewById(R.id.spinnerLanguage);
@@ -248,12 +265,17 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         String ret = null;
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        //sharedPref.edit().clear().commit(); // to fix corrupt serialization problem..
         try {
             ret = sharedPref.getString(key, "");
         } catch (NumberFormatException nfe) {
             Log.v(TAG, nfe.getMessage());
         }
 
+        /* Don't return a 0 length value... */
+        if (ret.length() == 0) {
+            ret = null;
+        }
         return ret;
     }
 }

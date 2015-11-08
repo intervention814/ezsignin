@@ -36,4 +36,7 @@
         <item>9</item>
         <item>10</item>
     </string-array>
+    <string name="title_activity_configure_income_table">ConfigureIncomeTableActivity</string>
+
+    <string name="hello_world">Hello world!</string>
 </resources>
