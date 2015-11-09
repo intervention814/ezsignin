@@ -5,8 +5,11 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.TableRow;
 import android.widget.TextView;
 
 import java.util.List;
@@ -37,12 +40,12 @@ public class RecordListAdapter extends ArrayAdapter {
         Record record = (Record)getItem(position);
 
         if (record != null) {
-            TextView tt1 = (TextView) v.findViewById(R.id.textViewRecordName);
-            Button button = (Button)v.findViewById(R.id.record_remove_button);
+            TextView textViewName = (TextView) v.findViewById(R.id.textViewRecordName);
+            ImageButton button = (ImageButton)v.findViewById(R.id.record_remove_button);
             button.setTag(record); /* Set the tag so we can pick it up in ondeleteclick */
 
-            if (tt1 != null) {
-                tt1.setText(record.getName());
+            if (textViewName != null) {
+                textViewName.setText(record.getName().length() == 0 ? "<No Name>" : record.getName());
             }
         }
 

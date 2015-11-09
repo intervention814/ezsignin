@@ -93,6 +93,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         this.configureLanguageSpinner(spinnerLanguage);
         this.configureHouseholdSpinner(spinnerHousehold);
+
+        /* Read records from file since we might be onCreating again */
+        mRecords = MainActivity.readRecords(getBaseContext());
     }
 
     @Override

@@ -7,9 +7,18 @@
     tools:context="signin.ez.ezsignin.RecordsActivity">
 
     <ListView
-        android:id="@+id/list"
+        android:id="@+id/listview_record"
         android:layout_height="wrap_content"
         android:layout_width="match_parent">
     </ListView>
 
+    <TextView
+        android:id="@+id/empty"
+        android:text="No records."
+        android:textSize="44px"
+        android:textStyle="bold"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:gravity="center"
+        />
 </RelativeLayout>

@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_height="wrap_content" android:orientation="vertical"
-    android:layout_width="fill_parent">
+    android:layout_width="fill_parent"
+    android:descendantFocusability="blocksDescendants">
 
     <TableRow android:layout_width="fill_parent"
         android:id="@+id/record_item_toprow"
@@ -9,21 +10,22 @@
 
         <TextView
             android:id="@+id/textViewRecordName"
-            android:layout_width="fill_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Name" android:textStyle="bold"
             android:gravity="left"
+            android:layout_gravity="center_vertical"
             android:layout_weight="1"
-            android:typeface="monospace"
             android:height="40sp" />
-        <Button
+
+
+        <ImageButton
             android:id="@+id/record_remove_button"
-            android:text="Remove"
-            android:onClick="removeRecord">
-
-        </Button>
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="removeRecord"
+            android:src="@drawable/ic_menu_delete"
+            android:background="@null">
+        </ImageButton>
     </TableRow>
-
-
-
 </TableLayout>

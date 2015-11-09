@@ -1,24 +1,18 @@
 package signin.ez.ezsignin;
 
-import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Adapter;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ListAdapter;
 import android.widget.ListView;
-
-import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class RecordsActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
+public class RecordsActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener, AdapterView.OnItemClickListener {
     private static final String TAG = "RecordsActibity";
 
     private ListView mListView = null;
@@ -34,7 +28,7 @@ public class RecordsActivity extends AppCompatActivity implements AdapterView.On
             Log.v(TAG, "Record list not read from file!");
         }
 
-        mListView = (ListView)findViewById(R.id.list);
+        mListView = (ListView)findViewById(R.id.listview_record);
         mListView.setOnItemSelectedListener(this);
 
         /* Can't pass null list to adapter */
@@ -43,6 +37,7 @@ public class RecordsActivity extends AppCompatActivity implements AdapterView.On
         }
         RecordListAdapter adapter = new RecordListAdapter(this, android.R.layout.simple_list_item_1, mRecordList);
         mListView.setAdapter(adapter);
+        mListView.setOnItemClickListener(this);
     }
 
     @Override
@@ -69,7 +64,7 @@ public class RecordsActivity extends AppCompatActivity implements AdapterView.On
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
+        Log.v(TAG, "Selected item!");
     }
 
     @Override
@@ -82,10 +77,25 @@ public class RecordsActivity extends AppCompatActivity implements AdapterView.On
      */
     public void removeRecord(View v) {
         Record recordToRemove = (Record)v.getTag();
-        Log.v(TAG, "Removing record " + recordToRemove.getRecordId());
         mRecordList.remove(recordToRemove);
         MainActivity.writeRecord(getBaseContext(), mRecordList);
         RecordListAdapter adapter = new RecordListAdapter(this, android.R.layout.simple_list_item_1, mRecordList);
         mListView.setAdapter(adapter);
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        Log.v(TAG, "Clicked a record");
+        Record recordClicked = (Record)parent.getItemAtPosition(position);
+        Log.v(TAG, "Record: " + recordClicked.getName());
+    }
+
+    @Override
+    public void onContentChanged() {
+        super.onContentChanged();
+
+        View empty = findViewById(R.id.empty);
+        ListView list = (ListView) findViewById(R.id.listview_record);
+        list.setEmptyView(empty);
     }
 }
