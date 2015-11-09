@@ -9,15 +9,38 @@
         android:layout_height="wrap_content">
 
         <TextView
-            android:id="@+id/textViewRecordName"
+            android:id="@+id/textViewRecordId"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Name" android:textStyle="bold"
-            android:gravity="left"
+            android:text="Id"
+            android:textStyle="bold"
+            android:gravity="center_vertical"
+            android:layout_gravity="center_vertical"
+            android:padding="20px"
+            android:height="40sp" />
+        <TextView
+            android:id="@+id/textViewRecordName"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:text="Name"
+            android:textStyle="bold"
+            android:gravity="center_vertical"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:height="40sp" />
+
+        <TextView
+            android:id="@+id/textViewRecordDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Date"
+            android:textStyle="bold"
+            android:gravity="right|center_vertical"
             android:layout_gravity="center_vertical"
             android:layout_weight="1"
             android:height="40sp" />
-
 
         <ImageButton
             android:id="@+id/record_remove_button"

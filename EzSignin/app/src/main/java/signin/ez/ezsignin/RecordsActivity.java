@@ -1,5 +1,8 @@
 package signin.ez.ezsignin;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -10,6 +13,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class RecordsActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener, AdapterView.OnItemClickListener {
@@ -41,6 +45,16 @@ public class RecordsActivity extends AppCompatActivity implements AdapterView.On
     }
 
     @Override
+    public void onResume() {
+        Log.v(TAG, "onResume");
+
+        super.onResume();
+        mRecordList = MainActivity.readRecords(getBaseContext());
+        RecordListAdapter adapter = new RecordListAdapter(this, android.R.layout.simple_list_item_1, mRecordList);
+        mListView.setAdapter(adapter);
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_records, menu);
@@ -58,13 +72,38 @@ public class RecordsActivity extends AppCompatActivity implements AdapterView.On
         if (id == R.id.action_settings) {
             return true;
         }
+        if (id == R.id.menu_delete_all) {
+            /* Delete all */
+            /* Get confirmation before removing */
+            new AlertDialog.Builder(this)
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setTitle("Confirm Delete All Records")
+                    .setMessage("Are you sure you want to remove all " + mRecordList.size() + " records?")
+                    .setPositiveButton("Yes", new DialogInterface.OnClickListener()
+                    {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Iterator<Record> recordIter = mRecordList.iterator();
+                            while (recordIter.hasNext()) {
+                                Record r = recordIter.next();
+                                recordIter.remove();
+                            }
+                            MainActivity.writeRecord(getBaseContext(), mRecordList);
+                            RecordListAdapter adapter = new RecordListAdapter(getBaseContext(), android.R.layout.simple_list_item_1, mRecordList);
+                            mListView.setAdapter(adapter);
+                        }
+
+                    })
+                    .setNegativeButton("No", null)
+                    .show();
+        }
 
         return super.onOptionsItemSelected(item);
     }
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        Log.v(TAG, "Selected item!");
+
     }
 
     @Override
@@ -76,18 +115,40 @@ public class RecordsActivity extends AppCompatActivity implements AdapterView.On
      * Handle removes clicks.
      */
     public void removeRecord(View v) {
-        Record recordToRemove = (Record)v.getTag();
-        mRecordList.remove(recordToRemove);
-        MainActivity.writeRecord(getBaseContext(), mRecordList);
-        RecordListAdapter adapter = new RecordListAdapter(this, android.R.layout.simple_list_item_1, mRecordList);
-        mListView.setAdapter(adapter);
+
+        final Record recordToRemove = (Record)v.getTag();
+
+        /* Get confirmation before removing */
+        new AlertDialog.Builder(this)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setTitle("Confirm Delete Record")
+                .setMessage("Are you sure you want to remove this record ("+recordToRemove.getName()+")?")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener()
+                {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        mRecordList.remove(recordToRemove);
+                        MainActivity.writeRecord(getBaseContext(), mRecordList);
+                        RecordListAdapter adapter = new RecordListAdapter(getBaseContext(), android.R.layout.simple_list_item_1, mRecordList);
+                        mListView.setAdapter(adapter);
+                    }
+
+                })
+                .setNegativeButton("No", null)
+                .show();
+
     }
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         Log.v(TAG, "Clicked a record");
-        Record recordClicked = (Record)parent.getItemAtPosition(position);
-        Log.v(TAG, "Record: " + recordClicked.getName());
+        Record selectedRecord = (Record)parent.getItemAtPosition(position);
+
+        //Intent detailRecordIntent = new Intent(this, DetailRecordActivity.class);
+        Intent detailRecordIntent = new Intent(this, MainActivity.class);
+        detailRecordIntent.putExtra(MainActivity.KEY_RECORD, selectedRecord);
+        detailRecordIntent.putExtra(MainActivity.KEY_MODIFY, true);
+        startActivity(detailRecordIntent);
     }
 
     @Override

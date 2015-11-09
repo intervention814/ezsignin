@@ -1,6 +1,8 @@
 package signin.ez.ezsignin;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
@@ -15,22 +17,26 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.text.DateFormat;
 import java.text.Format;
 import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -39,10 +45,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     public final static String KEY_INCOME_CONFIG = "KEY_INCOME_CONFIG";
     public final static String KEY_PREF_INCOME_TABLE = "KEY_PREF_INCOME_TABLE";
+    public final static String KEY_MODIFY = "KEY_MODIFY";
     public final static String KEY_RECORDS = "KEY_RECORDS";
+    public final static String KEY_RECORD = "KEY_RECORD";
     public static final String RECORDS_FILENAME = "RECORDS_FILE";
 
     private final static String TAG = "MainActivity";
+    private boolean isModifyingRecord = false;
     private List<Record> mRecords = new ArrayList<Record>();
     private final int NUM_RATES = 4;
     private boolean mIsAdapterSetSelectionLanguage = true;
@@ -96,6 +105,32 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         /* Read records from file since we might be onCreating again */
         mRecords = MainActivity.readRecords(getBaseContext());
+
+        /* Determine if we'e been called on to modify an existing record */
+        Intent i = getIntent();
+        Bundle b = i.getExtras();
+        if (b != null && b.getBoolean(KEY_MODIFY)) {
+            isModifyingRecord = true;
+            final Record recordToModify = (Record)b.get(KEY_RECORD);
+            this.populateFieldsWithRecord(recordToModify);
+            Button saveButton = (Button)findViewById(R.id.saveRecordButton);
+            saveButton.setText("Modify Record");
+            saveButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    for (Record r : mRecords) {
+                        if (r.getRecordId() == recordToModify.getRecordId()) {
+                            Log.v(TAG, "Modifying record " + r.getRecordId());
+                            writeFieldsToRecord(recordToModify);
+                            mRecords.set(mRecords.indexOf(r), recordToModify);
+                            MainActivity.writeRecord(getBaseContext(), mRecords);
+                            Toast.makeText(getBaseContext(), "Record modified.", Toast.LENGTH_SHORT).show();
+                            finish();
+                        }
+                    }
+                }
+            });
+        }
     }
 
     @Override
@@ -120,14 +155,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
         if (id == R.id.menu_records) {
             Intent recordsActivityIntent = new Intent(this, RecordsActivity.class);
-            //Bundle recordsBundle = new Bundle();
-            /* Serialize the records list... */
-            //Gson gson = new Gson();
-            //RecordListWrapper wrapper = new RecordListWrapper();
-            //wrapper.recordList = mRecords;
-            //String recordsListString = gson.toJson(wrapper);
-            //recordsActivityIntent.putExtra(MainActivity.KEY_RECORDS, recordsListString);
+            recordsActivityIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(recordsActivityIntent);
+
+            /* Don't want this to stay on stack when going to menu if we were modding */
+            if (isModifyingRecord) {
+                finish();
+            }
         }
 
         return super.onOptionsItemSelected(item);
@@ -290,8 +324,27 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
      */
     public void onSaveClick(View view) {
         Log.v(TAG, "Saving record...");
-        Record newRecord = new Record();
 
+        final Button b = (Button)findViewById(R.id.saveRecordButton);
+        b.setText("Saving...");
+        b.setEnabled(false);
+
+        Record newRecord = new Record();
+        this.writeFieldsToRecord(newRecord);
+        mRecords.add(newRecord);
+
+        /* Write all records to disk */
+        MainActivity.writeRecord(getApplicationContext(), mRecords);
+        b.setText("Save");
+        b.setEnabled(true);
+
+        Toast.makeText(getBaseContext(), "Saved record!", Toast.LENGTH_SHORT).show();
+
+        /* Reset the UI for next person... */
+        this.clearSigninPrompts();
+    }
+
+    private void writeFieldsToRecord(Record recordToWriteTo) {
         EditText editTextName = (EditText) findViewById(R.id.editTextName);
         EditText editTextAddress = (EditText) findViewById(R.id.editTextAddress);
         EditText editTextCounty = (EditText) findViewById(R.id.editTextCounty);
@@ -302,26 +355,21 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         CheckBox checkBoxEligibleSSI = (CheckBox) findViewById(R.id.checkBoxSsi);
         CheckBox checkBoxEligibleTANF = (CheckBox) findViewById(R.id.checkBoxTanf);
 
-        newRecord.setName(editTextName.getText().toString());
-        newRecord.setAddress(editTextAddress.getText().toString());
-        newRecord.setCounty(editTextCounty.getText().toString());
-        newRecord.setNumInHousehold(spinnerNumInHousehold.getSelectedItemPosition() + 1); /* +1 since start at 0 */
-        newRecord.setIsEligibleFS(checkBoxEligibleFS.isChecked());
-        newRecord.setIsEligibleIE(checkBoxEligibleIE.isChecked());
-        newRecord.setIsEligibleMC(checkBoxEligibleMC.isChecked());
-        newRecord.setIsEligibleSS(checkBoxEligibleSSI.isChecked());
-        newRecord.setIsEligibleTANF(checkBoxEligibleTANF.isChecked());
+        DateFormat dateFormatter = new SimpleDateFormat("MM/dd/yy hh:mm:ss");
+        dateFormatter.setLenient(false);
+        Date today = new Date();
+        String s = dateFormatter.format(today);
 
-        mRecords.add(newRecord);
-
-        /* Write all records to disk */
-        MainActivity.writeRecord(getApplicationContext(), mRecords);
-
-
-        // TODO nice confirmation screen please...
-
-        /* Reset the UI for next person... */
-        this.clearSigninPrompts();
+        recordToWriteTo.setName(editTextName.getText().toString());
+        recordToWriteTo.setAddress(editTextAddress.getText().toString());
+        recordToWriteTo.setCounty(editTextCounty.getText().toString());
+        recordToWriteTo.setNumInHousehold(spinnerNumInHousehold.getSelectedItemPosition() + 1); /* +1 since start at 0 */
+        recordToWriteTo.setIsEligibleFS(checkBoxEligibleFS.isChecked());
+        recordToWriteTo.setIsEligibleIE(checkBoxEligibleIE.isChecked());
+        recordToWriteTo.setIsEligibleMC(checkBoxEligibleMC.isChecked());
+        recordToWriteTo.setIsEligibleSS(checkBoxEligibleSSI.isChecked());
+        recordToWriteTo.setIsEligibleTANF(checkBoxEligibleTANF.isChecked());
+        recordToWriteTo.setDate(s);
     }
 
     /**
@@ -363,6 +411,14 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     Log.e(TAG, "Error in closing stream while reading records" + e.getMessage());
                 }
         }
+
+        /* Set record static ID */
+        int curId = 0;
+        for (Record r:records) {
+            curId = r.getRecordId();
+        }
+
+        Record.recordId = curId + 1;
 
         return records;
     }
@@ -408,5 +464,31 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             ret = null;
         }
         return ret;
+    }
+
+    /**
+     * Populate the fields with this record.
+     * @param record the record to be populated
+     */
+    private void populateFieldsWithRecord(Record record) {
+        EditText editTextName = (EditText) findViewById(R.id.editTextName);
+        EditText editTextAddress = (EditText) findViewById(R.id.editTextAddress);
+        EditText editTextCounty = (EditText) findViewById(R.id.editTextCounty);
+        Spinner spinnerNumInHousehold = (Spinner) findViewById(R.id.spinnerNumHousehold);
+        CheckBox checkBoxEligibleFS = (CheckBox) findViewById(R.id.checkBoxFoodstamps);
+        CheckBox checkBoxEligibleIE = (CheckBox) findViewById(R.id.checkBoxIncomeEligibility);
+        CheckBox checkBoxEligibleMC = (CheckBox) findViewById(R.id.checkBoxMedicaid);
+        CheckBox checkBoxEligibleSSI = (CheckBox) findViewById(R.id.checkBoxSsi);
+        CheckBox checkBoxEligibleTANF = (CheckBox) findViewById(R.id.checkBoxTanf);
+
+        editTextName.setText(record.getName());
+        editTextAddress.setText(record.getAddress());
+        editTextCounty.setText(record.getCounty());
+        spinnerNumInHousehold.setSelection(record.getNumInHousehold());
+        checkBoxEligibleFS.setChecked(record.isEligibleFS());
+        checkBoxEligibleIE.setChecked(record.isEligibleIE());
+        checkBoxEligibleMC.setChecked(record.isEligibleMC());
+        checkBoxEligibleSSI.setChecked(record.isEligibleSS());
+        checkBoxEligibleTANF.setChecked(record.isEligibleTANF());
     }
 }

@@ -41,11 +41,16 @@ public class RecordListAdapter extends ArrayAdapter {
 
         if (record != null) {
             TextView textViewName = (TextView) v.findViewById(R.id.textViewRecordName);
+            TextView textViewId = (TextView) v.findViewById(R.id.textViewRecordId);
+            TextView textViewDate = (TextView)v.findViewById(R.id.textViewRecordDate);
             ImageButton button = (ImageButton)v.findViewById(R.id.record_remove_button);
+
             button.setTag(record); /* Set the tag so we can pick it up in ondeleteclick */
+            textViewId.setText("# " + record.getRecordId());
+            textViewDate.setText(record.getDate());
 
             if (textViewName != null) {
-                textViewName.setText(record.getName().length() == 0 ? "<No Name>" : record.getName());
+                textViewName.setText(record.getName().length() == 0 ? "Name: <No Name>" : "Name: " + record.getName());
             }
         }
 

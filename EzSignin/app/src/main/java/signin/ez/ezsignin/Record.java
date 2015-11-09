@@ -9,7 +9,7 @@ import java.util.List;
  */
 public class Record implements Serializable {
     private String mName;
-    private Date mDate;
+    private String mDate;
     private String mCounty;
     private String mAddress;
     private int mNumInHousehold;
@@ -18,7 +18,7 @@ public class Record implements Serializable {
     private boolean isEligibleSS = false;
     private boolean isEligibleTANF = false;
     private boolean isEligibleIE = false;
-    private static int recordId = 0;
+    public static int recordId = 0;
     private int mRecordId = 0;
 
     public Record() {
@@ -31,14 +31,14 @@ public class Record implements Serializable {
     public void setCounty(String county) {
         mCounty = county;
     }
-    public void setDate(Date date) {
+    public void setDate(String date) {
         mDate = date;
     }
     public void setAddress(String address) {
         mAddress = address;
     }
     public void setNumInHousehold(int numInHousehold) {
-        numInHousehold = numInHousehold;
+        mNumInHousehold = numInHousehold;
     }
     public String getName() {
         return mName;
@@ -46,7 +46,7 @@ public class Record implements Serializable {
     public String getCounty() {
         return mCounty;
     }
-    public Date getDate() {
+    public String getDate() {
         return mDate;
     }
     public String getAddress() {

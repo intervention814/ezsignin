@@ -36,11 +36,17 @@
         <activity
             android:name=".RecordsActivity"
             android:label="@string/title_activity_records"
-            android:parentActivityName="signin.ez.ezsignin.MainActivity" >
+            android:parentActivityName=".MainActivity" >
+
             <!-- The meta-data element is needed for versions lower than 4.1 -->
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="signin.ez.ezsignin.MainActivity" />>
+                android:value="signin.ez.ezsignin.MainActivity" />
+>
+        </activity>
+        <activity
+            android:name=".DetailRecordActivity"
+            android:label="@string/title_activity_detail_record" >
         </activity>
     </application>
 
