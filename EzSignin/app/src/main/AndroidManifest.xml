@@ -44,10 +44,6 @@
                 android:value="signin.ez.ezsignin.MainActivity" />
 >
         </activity>
-        <activity
-            android:name=".DetailRecordActivity"
-            android:label="@string/title_activity_detail_record" >
-        </activity>
     </application>
 
 </manifest>

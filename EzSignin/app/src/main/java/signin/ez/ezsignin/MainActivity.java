@@ -43,22 +43,22 @@ import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
-    public final static String KEY_INCOME_CONFIG = "KEY_INCOME_CONFIG";
     public final static String KEY_PREF_INCOME_TABLE = "KEY_PREF_INCOME_TABLE";
     public final static String KEY_MODIFY = "KEY_MODIFY";
-    public final static String KEY_RECORDS = "KEY_RECORDS";
     public final static String KEY_RECORD = "KEY_RECORD";
     public static final String RECORDS_FILENAME = "RECORDS_FILE";
+
 
     private final static String TAG = "MainActivity";
     private boolean isModifyingRecord = false;
     private List<Record> mRecords = new ArrayList<Record>();
     private final int NUM_RATES = 4;
     private boolean mIsAdapterSetSelectionLanguage = true;
-    private final String KEY_LANG = "KEY_LANG";
-    private final String VALUE_LANG_SPANISH = "VALUE_LANG_SPANISH";
-    private final String VALUE_LANG_ENGLISH = "VALUE_LANG_ENGLISH";
+    private final static String VALUE_LANG_SPANISH = "VALUE_LANG_SPANISH";
+    private final static String VALUE_LANG_ENGLISH = "VALUE_LANG_ENGLISH";
     private String mEmail = "";
+
+    private static String CURRENT_LANGUAGE = VALUE_LANG_ENGLISH;
 
     /* Income table default configuration [# in household][rate] */
     private HashMap<Integer, List<Integer>> mIncomes;
@@ -72,29 +72,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         /* Retreive the cached email */
         mEmail = this.getPreferenceByKey(SettingsActivity.KEY_PREF_EMAIL);
 
-        String incomeTable = this.getPreferenceByKey(MainActivity.KEY_PREF_INCOME_TABLE);
-        if (incomeTable != null) {
-            Log.v(TAG, "Attempting to use new income table!");
-            Gson gson = new Gson();
-            HashMapWrapper wrapper = gson.fromJson(incomeTable, HashMapWrapper.class);
-            mIncomes = wrapper.hashMap;
-            if (mIncomes == null) {
-                throw new IllegalStateException("Income map not retreived from GSON object!");
-            }
-        } else {
-            Log.v(TAG, "Using default incomes!");
-            mIncomes = new HashMap<>();
-            mIncomes.put(1, Arrays.asList(20000, 2000, 350, 75));
-            mIncomes.put(2, Arrays.asList(30000, 3000, 450, 95));
-            mIncomes.put(3, Arrays.asList(40000, 4000, 550, 105));
-            mIncomes.put(4, Arrays.asList(50000, 5000, 650, 115));
-            mIncomes.put(5, Arrays.asList(60000, 6000, 750, 125));
-            mIncomes.put(6, Arrays.asList(70000, 7000, 850, 135));
-            mIncomes.put(7, Arrays.asList(80000, 8000, 950, 145));
-            mIncomes.put(8, Arrays.asList(90000, 9000, 1050, 155));
-            mIncomes.put(9, Arrays.asList(100000, 10000, 1150, 165));
-            mIncomes.put(10, Arrays.asList(110000, 11000, 1250, 175));
-        }
+        this.initIncomeTable();
 
         /* Configure the spinnerLanguage */
         Spinner spinnerLanguage = (Spinner) findViewById(R.id.spinnerLanguage);
@@ -103,34 +81,37 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         this.configureLanguageSpinner(spinnerLanguage);
         this.configureHouseholdSpinner(spinnerHousehold);
 
+        /* See if we're restoring a record */
+        if (savedInstanceState != null) {
+            Record r = (Record)savedInstanceState.get(KEY_RECORD);
+            if (r != null) {
+                Log.v(TAG, "Restoring a record from saved instance state.");
+                this.populateFieldsWithRecord(r);
+            }
+        }
+
         /* Read records from file since we might be onCreating again */
         mRecords = MainActivity.readRecords(getBaseContext());
 
         /* Determine if we'e been called on to modify an existing record */
-        Intent i = getIntent();
-        Bundle b = i.getExtras();
-        if (b != null && b.getBoolean(KEY_MODIFY)) {
-            isModifyingRecord = true;
-            final Record recordToModify = (Record)b.get(KEY_RECORD);
-            this.populateFieldsWithRecord(recordToModify);
-            Button saveButton = (Button)findViewById(R.id.saveRecordButton);
-            saveButton.setText("Modify Record");
-            saveButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    for (Record r : mRecords) {
-                        if (r.getRecordId() == recordToModify.getRecordId()) {
-                            Log.v(TAG, "Modifying record " + r.getRecordId());
-                            writeFieldsToRecord(recordToModify);
-                            mRecords.set(mRecords.indexOf(r), recordToModify);
-                            MainActivity.writeRecord(getBaseContext(), mRecords);
-                            Toast.makeText(getBaseContext(), "Record modified.", Toast.LENGTH_SHORT).show();
-                            finish();
-                        }
-                    }
-                }
-            });
-        }
+        this.checkForModifyLaunch();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle b) {
+        Record currentRecord = new Record();
+        this.writeFieldsToRecord(currentRecord);
+        b.putSerializable(KEY_RECORD, currentRecord);
     }
 
     @Override
@@ -185,7 +166,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 /* Don't respond to adapter setting selections */
                 if (mIsAdapterSetSelectionLanguage) {
                     mIsAdapterSetSelectionLanguage = false;
-                    Log.v(TAG, "Adapter set selection!");
                     return;
                 }
                 if (pos == 0) {
@@ -202,7 +182,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 }
                 break;
             case R.id.spinnerNumHousehold:
-                Log.v(TAG, "Household: " + (pos + 1));
                 this.updateIncomeTable(pos + 1);
                 break;
         }
@@ -215,8 +194,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
      */
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
-        // Another interface callback
-        Log.v(TAG, "onNothingSelected");
+
     }
 
     /* Custom methods */
@@ -241,9 +219,16 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
      * @param language the language that is should start in
      */
     private void refresh(String language) {
+        CURRENT_LANGUAGE = language;
         Intent refresh = getIntent();
+        Record.recordId--; /* TODO this is awful, needed now to avoid id mismatch on refresh */
+        Record record = new Record();
+        this.writeFieldsToRecord(record);
+        refresh.putExtra(KEY_RECORD, record);
+        if (isModifyingRecord) {
+            refresh.putExtra(KEY_MODIFY, true);
+        }
         finish();
-        refresh.putExtra(KEY_LANG, language);
         startActivity(refresh);
     }
 
@@ -260,12 +245,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         spinnerLanguage.setAdapter(adapter);
 
         /* Handle language change */
-        Intent intent = getIntent();
-        String languange = intent.getStringExtra(KEY_LANG);
-        if (languange != null && languange.compareTo(VALUE_LANG_ENGLISH) == 0) {
+        if (CURRENT_LANGUAGE.compareTo(VALUE_LANG_ENGLISH) == 0) {
             spinnerLanguage.setSelection(0);
         }
-        if (languange != null && languange.compareTo(VALUE_LANG_SPANISH) == 0) {
+        if (CURRENT_LANGUAGE.compareTo(VALUE_LANG_SPANISH) == 0) {
             spinnerLanguage.setSelection(1);
         }
         spinnerLanguage.setOnItemSelectedListener(this);
@@ -344,6 +327,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         this.clearSigninPrompts();
     }
 
+    /**
+     * Write fields to record
+     * @param recordToWriteTo the record to write to
+     */
     private void writeFieldsToRecord(Record recordToWriteTo) {
         EditText editTextName = (EditText) findViewById(R.id.editTextName);
         EditText editTextAddress = (EditText) findViewById(R.id.editTextAddress);
@@ -391,6 +378,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
     }
 
+    /**
+     * Reads records from the serialized records file
+     *
+     * @param context the context from which to read
+     * @return the list of records from the file.
+     */
     public static List<Record> readRecords(Context context) {
         ArrayList<Record> records = null;
         FileInputStream fin;
@@ -423,6 +416,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         return records;
     }
 
+    /**
+     * Zero out the prompts, after a save
+     */
     private void clearSigninPrompts() {
         EditText editTextName = (EditText) findViewById(R.id.editTextName);
         EditText editTextAddress = (EditText) findViewById(R.id.editTextAddress);
@@ -468,7 +464,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     /**
      * Populate the fields with this record.
-     * @param record the record to be populated
+     * @param record the record from which fields will be populated
      */
     private void populateFieldsWithRecord(Record record) {
         EditText editTextName = (EditText) findViewById(R.id.editTextName);
@@ -484,11 +480,77 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         editTextName.setText(record.getName());
         editTextAddress.setText(record.getAddress());
         editTextCounty.setText(record.getCounty());
-        spinnerNumInHousehold.setSelection(record.getNumInHousehold());
+        spinnerNumInHousehold.setSelection(record.getNumInHousehold() - 1);
         checkBoxEligibleFS.setChecked(record.isEligibleFS());
         checkBoxEligibleIE.setChecked(record.isEligibleIE());
         checkBoxEligibleMC.setChecked(record.isEligibleMC());
         checkBoxEligibleSSI.setChecked(record.isEligibleSS());
         checkBoxEligibleTANF.setChecked(record.isEligibleTANF());
+    }
+
+    /**
+     * Check to see if this intent was started to modify instead of save a new record.
+     */
+    private void checkForModifyLaunch() {
+        Intent i = getIntent();
+        Bundle b = i.getExtras();
+        if (b != null && b.getBoolean(KEY_MODIFY)) {
+            Log.v(TAG, "Modifying!");
+            isModifyingRecord = true;
+            final Record recordToModify = (Record)b.get(KEY_RECORD);
+            this.populateFieldsWithRecord(recordToModify);
+            Button saveButton = (Button)findViewById(R.id.saveRecordButton);
+            saveButton.setText("Modify Record: " + recordToModify.getRecordId());
+            saveButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Log.v(TAG, "Modify onClick");
+                    for (Record r : mRecords) {
+                        if (r.getRecordId() == recordToModify.getRecordId()) {
+                            Log.v(TAG, "Record found!");
+                            Log.v(TAG, "Modifying record " + r.getRecordId());
+                            writeFieldsToRecord(recordToModify);
+                            mRecords.set(mRecords.indexOf(r), recordToModify);
+                            MainActivity.writeRecord(getBaseContext(), mRecords);
+                            Toast.makeText(getBaseContext(), "Record modified.", Toast.LENGTH_SHORT).show();
+                            finish();
+                        }
+                    }
+                }
+            });
+        } else if (b != null && b.get(KEY_RECORD) != null) {
+            /* If we get here without modify, then we're just restoring a record, maybe from a language change */
+            Record restorationRecord = (Record)b.get(KEY_RECORD);
+            this.populateFieldsWithRecord(restorationRecord);
+        }
+    }
+
+    /**
+     * Initialize the income table from preferences or from hardcoded defaults
+     */
+    private void initIncomeTable() {
+        String incomeTable = this.getPreferenceByKey(MainActivity.KEY_PREF_INCOME_TABLE);
+        if (incomeTable != null) {
+            Log.v(TAG, "Attempting to use new income table!");
+            Gson gson = new Gson();
+            HashMapWrapper wrapper = gson.fromJson(incomeTable, HashMapWrapper.class);
+            mIncomes = wrapper.hashMap;
+            if (mIncomes == null) {
+                throw new IllegalStateException("Income map not retreived from GSON object!");
+            }
+        } else {
+            Log.v(TAG, "Using default incomes!");
+            mIncomes = new HashMap<>();
+            mIncomes.put(1, Arrays.asList(20000, 2000, 350, 75));
+            mIncomes.put(2, Arrays.asList(30000, 3000, 450, 95));
+            mIncomes.put(3, Arrays.asList(40000, 4000, 550, 105));
+            mIncomes.put(4, Arrays.asList(50000, 5000, 650, 115));
+            mIncomes.put(5, Arrays.asList(60000, 6000, 750, 125));
+            mIncomes.put(6, Arrays.asList(70000, 7000, 850, 135));
+            mIncomes.put(7, Arrays.asList(80000, 8000, 950, 145));
+            mIncomes.put(8, Arrays.asList(90000, 9000, 1050, 155));
+            mIncomes.put(9, Arrays.asList(100000, 10000, 1150, 165));
+            mIncomes.put(10, Arrays.asList(110000, 11000, 1250, 175));
+        }
     }
 }
