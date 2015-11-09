@@ -29,15 +29,6 @@ public class RecordsActivity extends AppCompatActivity implements AdapterView.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_records);
 
-//        Intent intent = getIntent();
-//        Bundle records = intent.getExtras();
-//        if (records != null) {
-//            String recordListString = (String)records.get(MainActivity.KEY_RECORDS);
-//            Gson gson = new Gson();
-//            RecordListWrapper wrapper = gson.fromJson(recordListString, RecordListWrapper.class);
-//            mRecordList = wrapper.recordList;
-//        }
-
         mRecordList = MainActivity.readRecords(getBaseContext());
         if (mRecordList == null) {
             Log.v(TAG, "Record list not read from file!");
@@ -92,5 +83,9 @@ public class RecordsActivity extends AppCompatActivity implements AdapterView.On
     public void removeRecord(View v) {
         Record recordToRemove = (Record)v.getTag();
         Log.v(TAG, "Removing record " + recordToRemove.getRecordId());
+        mRecordList.remove(recordToRemove);
+        MainActivity.writeRecord(getBaseContext(), mRecordList);
+        RecordListAdapter adapter = new RecordListAdapter(this, android.R.layout.simple_list_item_1, mRecordList);
+        mListView.setAdapter(adapter);
     }
 }
