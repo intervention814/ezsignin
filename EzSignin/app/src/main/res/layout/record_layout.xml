@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="wrap_content" android:orientation="vertical"
+    android:layout_width="fill_parent">
+
+    <TableRow android:layout_width="fill_parent"
+        android:id="@+id/record_item_toprow"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/textViewRecordName"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Name" android:textStyle="bold"
+            android:gravity="left"
+            android:layout_weight="1"
+            android:typeface="monospace"
+            android:height="40sp" />
+    </TableRow>
+
+
+
+</TableLayout>

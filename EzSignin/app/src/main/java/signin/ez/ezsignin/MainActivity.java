@@ -14,6 +14,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -21,6 +23,7 @@ import com.google.gson.Gson;
 
 import java.text.Format;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -30,8 +33,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     public final static String KEY_INCOME_CONFIG = "KEY_INCOME_CONFIG";
     public final static String KEY_PREF_INCOME_TABLE = "KEY_PREF_INCOME_TABLE";
+    public final static String KEY_RECORDS = "KEY_RECORDS";
 
     private final static String TAG = "MainActivity";
+    private List<Record> mRecords = new ArrayList<Record>();
     private final int NUM_RATES = 4;
     private boolean mIsAdapterSetSelectionLanguage = true;
     private final String KEY_LANG = "KEY_LANG";
@@ -102,6 +107,17 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             Intent settingsActivityIntent = new Intent(this, SettingsActivity.class);
             startActivity(settingsActivityIntent);
             return true;
+        }
+        if (id == R.id.menu_records) {
+            Intent recordsActivityIntent = new Intent(this, RecordsActivity.class);
+            Bundle recordsBundle = new Bundle();
+            /* Serialize the records list... */
+            Gson gson = new Gson();
+            RecordListWrapper wrapper = new RecordListWrapper();
+            wrapper.recordList = mRecords;
+            String recordsListString = gson.toJson(wrapper);
+            recordsActivityIntent.putExtra(MainActivity.KEY_RECORDS, recordsListString);
+            startActivity(recordsActivityIntent);
         }
 
         return super.onOptionsItemSelected(item);
@@ -255,7 +271,55 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
      * @param view
      */
     public void onSaveClick(View view) {
-        Log.v(TAG, "Saving!");
+        Log.v(TAG, "Saving record...");
+        Record newRecord = new Record();
+
+        EditText editTextName = (EditText)findViewById(R.id.editTextName);
+        EditText editTextAddress = (EditText)findViewById(R.id.editTextAddress);
+        EditText editTextCounty = (EditText)findViewById(R.id.editTextCounty);
+        Spinner spinnerNumInHousehold = (Spinner)findViewById(R.id.spinnerNumHousehold);
+        CheckBox checkBoxEligibleFS = (CheckBox)findViewById(R.id.checkBoxFoodstamps);
+        CheckBox checkBoxEligibleIE = (CheckBox)findViewById(R.id.checkBoxIncomeEligibility);
+        CheckBox checkBoxEligibleMC = (CheckBox)findViewById(R.id.checkBoxMedicaid);
+        CheckBox checkBoxEligibleSSI = (CheckBox)findViewById(R.id.checkBoxSsi);
+        CheckBox checkBoxEligibleTANF = (CheckBox)findViewById(R.id.checkBoxTanf);
+
+        newRecord.setName(editTextName.getText().toString());
+        newRecord.setAddress(editTextAddress.getText().toString());
+        newRecord.setCounty(editTextCounty.getText().toString());
+        newRecord.setNumInHousehold(spinnerNumInHousehold.getSelectedItemPosition() + 1); /* +1 since start at 0 */
+        newRecord.setIsEligibleFS(checkBoxEligibleFS.isChecked());
+        newRecord.setIsEligibleIE(checkBoxEligibleIE.isChecked());
+        newRecord.setIsEligibleMC(checkBoxEligibleMC.isChecked());
+        newRecord.setIsEligibleSS(checkBoxEligibleSSI.isChecked());
+        newRecord.setIsEligibleTANF(checkBoxEligibleTANF.isChecked());
+
+        mRecords.add(newRecord);
+
+        /* Reset the UI for next person... */
+        this.clearSigninPrompts();
+    }
+
+    private void clearSigninPrompts() {
+        EditText editTextName = (EditText)findViewById(R.id.editTextName);
+        EditText editTextAddress = (EditText)findViewById(R.id.editTextAddress);
+        EditText editTextCounty = (EditText)findViewById(R.id.editTextCounty);
+        Spinner spinnerNumInHousehold = (Spinner)findViewById(R.id.spinnerNumHousehold);
+        CheckBox checkBoxEligibleFS = (CheckBox)findViewById(R.id.checkBoxFoodstamps);
+        CheckBox checkBoxEligibleIE = (CheckBox)findViewById(R.id.checkBoxIncomeEligibility);
+        CheckBox checkBoxEligibleMC = (CheckBox)findViewById(R.id.checkBoxMedicaid);
+        CheckBox checkBoxEligibleSSI = (CheckBox)findViewById(R.id.checkBoxSsi);
+        CheckBox checkBoxEligibleTANF = (CheckBox)findViewById(R.id.checkBoxTanf);
+
+        editTextName.setText("");
+        editTextAddress.setText("");
+        editTextCounty.setText("");
+        spinnerNumInHousehold.setSelection(0);
+        checkBoxEligibleFS.setChecked(false);
+        checkBoxEligibleIE.setChecked(false);
+        checkBoxEligibleMC.setChecked(false);
+        checkBoxEligibleSSI.setChecked(false);
+        checkBoxEligibleTANF.setChecked(false);
     }
 
     /**

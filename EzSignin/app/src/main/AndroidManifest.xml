@@ -29,8 +29,13 @@
             android:label="@string/title_activity_configure_income_table" >
             <intent-filter>
                 <action android:name="signin.ez.ezsignin.ConfigureIncomeTableActivity" />
+
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name=".RecordsActivity"
+            android:label="@string/title_activity_records" >
         </activity>
     </application>
 
