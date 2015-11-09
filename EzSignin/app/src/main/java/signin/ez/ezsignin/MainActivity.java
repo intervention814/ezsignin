@@ -1,5 +1,6 @@
 package signin.ez.ezsignin;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
@@ -21,6 +22,11 @@ import android.widget.TextView;
 
 import com.google.gson.Gson;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.text.Format;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -34,6 +40,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public final static String KEY_INCOME_CONFIG = "KEY_INCOME_CONFIG";
     public final static String KEY_PREF_INCOME_TABLE = "KEY_PREF_INCOME_TABLE";
     public final static String KEY_RECORDS = "KEY_RECORDS";
+    public static final String RECORDS_FILENAME = "RECORDS_FILE";
 
     private final static String TAG = "MainActivity";
     private List<Record> mRecords = new ArrayList<Record>();
@@ -81,8 +88,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
 
         /* Configure the spinnerLanguage */
-        Spinner spinnerLanguage = (Spinner)findViewById(R.id.spinnerLanguage);
-        Spinner spinnerHousehold = (Spinner)findViewById(R.id.spinnerNumHousehold);
+        Spinner spinnerLanguage = (Spinner) findViewById(R.id.spinnerLanguage);
+        Spinner spinnerHousehold = (Spinner) findViewById(R.id.spinnerNumHousehold);
 
         this.configureLanguageSpinner(spinnerLanguage);
         this.configureHouseholdSpinner(spinnerHousehold);
@@ -110,13 +117,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
         if (id == R.id.menu_records) {
             Intent recordsActivityIntent = new Intent(this, RecordsActivity.class);
-            Bundle recordsBundle = new Bundle();
+            //Bundle recordsBundle = new Bundle();
             /* Serialize the records list... */
-            Gson gson = new Gson();
-            RecordListWrapper wrapper = new RecordListWrapper();
-            wrapper.recordList = mRecords;
-            String recordsListString = gson.toJson(wrapper);
-            recordsActivityIntent.putExtra(MainActivity.KEY_RECORDS, recordsListString);
+            //Gson gson = new Gson();
+            //RecordListWrapper wrapper = new RecordListWrapper();
+            //wrapper.recordList = mRecords;
+            //String recordsListString = gson.toJson(wrapper);
+            //recordsActivityIntent.putExtra(MainActivity.KEY_RECORDS, recordsListString);
             startActivity(recordsActivityIntent);
         }
 
@@ -125,6 +132,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     /**
      * Handle spinner changes
+     *
      * @param parent
      * @param view
      * @param pos
@@ -134,7 +142,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
         Log.v(TAG, "onItemSelected" + pos);
 
-        Spinner spinner = (Spinner)parent;
+        Spinner spinner = (Spinner) parent;
         switch (spinner.getId()) {
             case R.id.spinnerLanguage:
                 /* Don't respond to adapter setting selections */
@@ -165,6 +173,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     /**
      * Handle nothing selected
+     *
      * @param parent
      */
     @Override
@@ -177,6 +186,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     /**
      * Set the locale to language
+     *
      * @param language the language code to set
      */
     private void setLanguage(String language) {
@@ -190,6 +200,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     /**
      * Refresh this activity
+     *
      * @param language the language that is should start in
      */
     private void refresh(String language) {
@@ -201,6 +212,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     /**
      * Configure the language spinner
+     *
      * @param spinnerLanguage the language spinner
      */
     private void configureLanguageSpinner(Spinner spinnerLanguage) {
@@ -222,17 +234,18 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         spinnerLanguage.setOnItemSelectedListener(this);
     }
 
-    /** Configure the household spinner.
+    /**
+     * Configure the household spinner.
      *
      * @param spinnerHousehold the household spinner
      */
     private void configureHouseholdSpinner(Spinner spinnerHousehold) {
         String[] array = getResources().getStringArray(R.array.household_array);
         Integer[] householdInts = new Integer[array.length];
-        for(int i = 0; i < array.length; i++) {
+        for (int i = 0; i < array.length; i++) {
             householdInts[i] = Integer.parseInt(array[i]);
         }
-        ArrayAdapter<Integer> adapter = new ArrayAdapter<Integer>(this,android.R.layout.simple_spinner_item, householdInts);
+        ArrayAdapter<Integer> adapter = new ArrayAdapter<Integer>(this, android.R.layout.simple_spinner_item, householdInts);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         if (adapter == null) {
             Log.v(TAG, "Adapter is null!");
@@ -244,13 +257,14 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     /**
      * Update the table for minimum incomes.
+     *
      * @param numInHousehold the number of people in the household.
      */
     private void updateIncomeTable(int numInHousehold) {
-        TextView incomeAnnual = (TextView)findViewById(R.id.incomeTableIncomeAnnual);
-        TextView incomeMonthly = (TextView)findViewById(R.id.incomeTableIncomeMonthly);
-        TextView incomeWeek = (TextView)findViewById(R.id.incomeTableIncomeWeek);
-        TextView incomeDay = (TextView)findViewById(R.id.incomeTableIncomeDay);
+        TextView incomeAnnual = (TextView) findViewById(R.id.incomeTableIncomeAnnual);
+        TextView incomeMonthly = (TextView) findViewById(R.id.incomeTableIncomeMonthly);
+        TextView incomeWeek = (TextView) findViewById(R.id.incomeTableIncomeWeek);
+        TextView incomeDay = (TextView) findViewById(R.id.incomeTableIncomeDay);
 
         List<Integer> incomeList = mIncomes.get(numInHousehold);
         if (incomeList == null && incomeList.size() < NUM_RATES) {
@@ -268,21 +282,22 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     /**
      * Handles save button press.
+     *
      * @param view
      */
     public void onSaveClick(View view) {
         Log.v(TAG, "Saving record...");
         Record newRecord = new Record();
 
-        EditText editTextName = (EditText)findViewById(R.id.editTextName);
-        EditText editTextAddress = (EditText)findViewById(R.id.editTextAddress);
-        EditText editTextCounty = (EditText)findViewById(R.id.editTextCounty);
-        Spinner spinnerNumInHousehold = (Spinner)findViewById(R.id.spinnerNumHousehold);
-        CheckBox checkBoxEligibleFS = (CheckBox)findViewById(R.id.checkBoxFoodstamps);
-        CheckBox checkBoxEligibleIE = (CheckBox)findViewById(R.id.checkBoxIncomeEligibility);
-        CheckBox checkBoxEligibleMC = (CheckBox)findViewById(R.id.checkBoxMedicaid);
-        CheckBox checkBoxEligibleSSI = (CheckBox)findViewById(R.id.checkBoxSsi);
-        CheckBox checkBoxEligibleTANF = (CheckBox)findViewById(R.id.checkBoxTanf);
+        EditText editTextName = (EditText) findViewById(R.id.editTextName);
+        EditText editTextAddress = (EditText) findViewById(R.id.editTextAddress);
+        EditText editTextCounty = (EditText) findViewById(R.id.editTextCounty);
+        Spinner spinnerNumInHousehold = (Spinner) findViewById(R.id.spinnerNumHousehold);
+        CheckBox checkBoxEligibleFS = (CheckBox) findViewById(R.id.checkBoxFoodstamps);
+        CheckBox checkBoxEligibleIE = (CheckBox) findViewById(R.id.checkBoxIncomeEligibility);
+        CheckBox checkBoxEligibleMC = (CheckBox) findViewById(R.id.checkBoxMedicaid);
+        CheckBox checkBoxEligibleSSI = (CheckBox) findViewById(R.id.checkBoxSsi);
+        CheckBox checkBoxEligibleTANF = (CheckBox) findViewById(R.id.checkBoxTanf);
 
         newRecord.setName(editTextName.getText().toString());
         newRecord.setAddress(editTextAddress.getText().toString());
@@ -296,20 +311,69 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         mRecords.add(newRecord);
 
+        /* Write all records to disk */
+        MainActivity.writeRecord(getApplicationContext(), mRecords);
+
+
+        // TODO nice confirmation screen please...
+
         /* Reset the UI for next person... */
         this.clearSigninPrompts();
     }
 
+    /**
+     * Write records to disk
+     *
+     * @param context context from which filedir is obtained
+     * @param records the list of records to write
+     */
+    public static void writeRecord(Context context, List<Record> records) {
+        ObjectOutputStream outputStream;
+        FileOutputStream fos;
+        try {
+            fos = context.openFileOutput(RECORDS_FILENAME, Context.MODE_PRIVATE);
+            outputStream = new ObjectOutputStream(fos);
+            outputStream.writeObject(records);
+            outputStream.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static List<Record> readRecords(Context context) {
+        ArrayList<Record> records = null;
+        FileInputStream fin;
+        ObjectInputStream ois = null;
+        try {
+            fin = context.openFileInput(RECORDS_FILENAME);
+            ois = new ObjectInputStream(fin);
+            records = (ArrayList<Record>) ois.readObject();
+            ois.close();
+            Log.v(TAG, "Records read successfully");
+        } catch (Exception e) {
+            Log.e(TAG, "Cant read saved records" + e.getMessage());
+        } finally {
+            if (ois != null)
+                try {
+                    ois.close();
+                } catch (Exception e) {
+                    Log.e(TAG, "Error in closing stream while reading records" + e.getMessage());
+                }
+        }
+
+        return records;
+    }
+
     private void clearSigninPrompts() {
-        EditText editTextName = (EditText)findViewById(R.id.editTextName);
-        EditText editTextAddress = (EditText)findViewById(R.id.editTextAddress);
-        EditText editTextCounty = (EditText)findViewById(R.id.editTextCounty);
-        Spinner spinnerNumInHousehold = (Spinner)findViewById(R.id.spinnerNumHousehold);
-        CheckBox checkBoxEligibleFS = (CheckBox)findViewById(R.id.checkBoxFoodstamps);
-        CheckBox checkBoxEligibleIE = (CheckBox)findViewById(R.id.checkBoxIncomeEligibility);
-        CheckBox checkBoxEligibleMC = (CheckBox)findViewById(R.id.checkBoxMedicaid);
-        CheckBox checkBoxEligibleSSI = (CheckBox)findViewById(R.id.checkBoxSsi);
-        CheckBox checkBoxEligibleTANF = (CheckBox)findViewById(R.id.checkBoxTanf);
+        EditText editTextName = (EditText) findViewById(R.id.editTextName);
+        EditText editTextAddress = (EditText) findViewById(R.id.editTextAddress);
+        EditText editTextCounty = (EditText) findViewById(R.id.editTextCounty);
+        Spinner spinnerNumInHousehold = (Spinner) findViewById(R.id.spinnerNumHousehold);
+        CheckBox checkBoxEligibleFS = (CheckBox) findViewById(R.id.checkBoxFoodstamps);
+        CheckBox checkBoxEligibleIE = (CheckBox) findViewById(R.id.checkBoxIncomeEligibility);
+        CheckBox checkBoxEligibleMC = (CheckBox) findViewById(R.id.checkBoxMedicaid);
+        CheckBox checkBoxEligibleSSI = (CheckBox) findViewById(R.id.checkBoxSsi);
+        CheckBox checkBoxEligibleTANF = (CheckBox) findViewById(R.id.checkBoxTanf);
 
         editTextName.setText("");
         editTextAddress.setText("");

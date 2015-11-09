@@ -1,12 +1,13 @@
 package signin.ez.ezsignin;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
 /**
  * Created by Freeman on 11/8/15.
  */
-public class Record {
+public class Record implements Serializable {
     private String mName;
     private Date mDate;
     private String mCounty;
@@ -17,9 +18,11 @@ public class Record {
     private boolean isEligibleSS = false;
     private boolean isEligibleTANF = false;
     private boolean isEligibleIE = false;
+    private static int recordId = 0;
+    private int mRecordId = 0;
 
     public Record() {
-
+        mRecordId = recordId++;
     }
 
     public void setName(String name) {
@@ -91,5 +94,9 @@ public class Record {
 
     public void setIsEligibleIE(boolean isEligibleIE) {
         this.isEligibleIE = isEligibleIE;
+    }
+
+    public int getRecordId() {
+        return mRecordId;
     }
 }

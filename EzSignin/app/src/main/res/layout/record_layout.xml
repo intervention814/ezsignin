@@ -16,6 +16,12 @@
             android:layout_weight="1"
             android:typeface="monospace"
             android:height="40sp" />
+        <Button
+            android:id="@+id/record_remove_button"
+            android:text="Remove"
+            android:onClick="removeRecord">
+
+        </Button>
     </TableRow>
 
 
