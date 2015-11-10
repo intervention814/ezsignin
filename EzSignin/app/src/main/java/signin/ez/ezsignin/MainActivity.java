@@ -144,6 +144,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 finish();
             }
         }
+        if (id == R.id.menu_summary) {
+            Intent summaryActivityIntent = new Intent(this, SummaryActivity.class);
+            summaryActivityIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(summaryActivityIntent);
+        }
 
         return super.onOptionsItemSelected(item);
     }
