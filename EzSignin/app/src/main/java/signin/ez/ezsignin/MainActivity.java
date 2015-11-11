@@ -91,19 +91,20 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public void onResume() {
         Log.v(TAG, "onResume");
         this.initIncomeTable();
-        Spinner spinner =(Spinner)findViewById(R.id.spinnerNumHousehold);
+        Spinner spinner = (Spinner)findViewById(R.id.spinnerNumHousehold);
         configureHouseholdSpinner(spinner);
         if (SPINNER_VALUE >= 0) {
             Log.v(TAG, "Restoring " + SPINNER_VALUE);
             spinner.setSelection(SPINNER_VALUE);
         }
+        this.checkForModifyLaunch();
         super.onResume();
     }
 
     @Override
     public void onPause() {
         Log.v(TAG, "onPause");
-        Spinner spinner =(Spinner)findViewById(R.id.spinnerNumHousehold);
+        Spinner spinner = (Spinner)findViewById(R.id.spinnerNumHousehold);
         SPINNER_VALUE = spinner.getSelectedItemPosition();
         Log.v(TAG, "Saving " + SPINNER_VALUE);
         super.onPause();
@@ -533,6 +534,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             /* If we get here without modify, then we're just restoring a record, maybe from a language change */
             Record restorationRecord = (Record)b.get(SettingsActivity.KEY_RECORD);
             this.populateFieldsWithRecord(restorationRecord);
+        } else {
+            /* Not modifying AND not saved record, so reset everything */
+            this.clearSigninPrompts();
         }
     }
 
