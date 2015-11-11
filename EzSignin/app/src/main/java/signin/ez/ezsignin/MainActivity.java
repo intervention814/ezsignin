@@ -86,16 +86,26 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         this.checkForModifyLaunch();
     }
 
+    private static int SPINNER_VALUE = -1;
     @Override
     public void onResume() {
         Log.v(TAG, "onResume");
         this.initIncomeTable();
+        Spinner spinner =(Spinner)findViewById(R.id.spinnerNumHousehold);
+        configureHouseholdSpinner(spinner);
+        if (SPINNER_VALUE >= 0) {
+            Log.v(TAG, "Restoring " + SPINNER_VALUE);
+            spinner.setSelection(SPINNER_VALUE);
+        }
         super.onResume();
     }
 
     @Override
     public void onPause() {
         Log.v(TAG, "onPause");
+        Spinner spinner =(Spinner)findViewById(R.id.spinnerNumHousehold);
+        SPINNER_VALUE = spinner.getSelectedItemPosition();
+        Log.v(TAG, "Saving " + SPINNER_VALUE);
         super.onPause();
     }
 
@@ -479,7 +489,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         editTextName.setText(record.getName());
         editTextAddress.setText(record.getAddress());
         editTextCounty.setText(record.getCounty());
-        spinnerNumInHousehold.setSelection(record.getNumInHousehold() - 1, true);
+        spinnerNumInHousehold.setSelection(record.getNumInHousehold() - 1);
+        SPINNER_VALUE = record.getNumInHousehold() - 1;
+        Log.v(TAG, "Saving from record in spinner: " + SPINNER_VALUE);
         checkBoxEligibleFS.setChecked(record.isEligibleFS());
         checkBoxEligibleIE.setChecked(record.isEligibleIE());
         checkBoxEligibleMC.setChecked(record.isEligibleMC());
