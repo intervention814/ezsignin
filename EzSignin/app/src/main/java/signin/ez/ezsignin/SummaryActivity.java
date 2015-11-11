@@ -44,7 +44,7 @@ public class SummaryActivity extends AppCompatActivity {
         setContentView(R.layout.activity_summary);
 
         /* Get a reference to the email records button */
-        mEmailRecordsButton = (Button)findViewById(R.id.buttonEmailRecords);
+        mEmailRecordsButton = (Button) findViewById(R.id.buttonEmailRecords);
         mEmailRecordsButton.setEnabled(false);
 
         /* Get the records from the file */
@@ -53,16 +53,17 @@ public class SummaryActivity extends AppCompatActivity {
         this.initSummaryTable();
     }
 
+
     /**
      * Initialize the summary table.
      */
     private void initSummaryTable() {
-        TextView summaryRecordsTotal = (TextView)findViewById(R.id.summaryTotalRecords);
-        TextView summaryRecordsIncomeEligible = (TextView)findViewById(R.id.summaryTotalPctIncomeEligible);
-        TextView summaryRecordsMedicare = (TextView)findViewById(R.id.summaryTotalPctMedicare);
-        TextView summaryRecordsFoodstamps = (TextView)findViewById(R.id.summaryTotalPctSocialFoodStamps);
-        TextView summaryRecordsSecurity = (TextView)findViewById(R.id.summaryTotalPctSocialSecurity);
-        TextView summaryRecordsTANF = (TextView)findViewById(R.id.summaryTotalPctTANF);
+        TextView summaryRecordsTotal = (TextView) findViewById(R.id.summaryTotalRecords);
+        TextView summaryRecordsIncomeEligible = (TextView) findViewById(R.id.summaryTotalPctIncomeEligible);
+        TextView summaryRecordsMedicare = (TextView) findViewById(R.id.summaryTotalPctMedicare);
+        TextView summaryRecordsFoodstamps = (TextView) findViewById(R.id.summaryTotalPctSocialFoodStamps);
+        TextView summaryRecordsSecurity = (TextView) findViewById(R.id.summaryTotalPctSocialSecurity);
+        TextView summaryRecordsTANF = (TextView) findViewById(R.id.summaryTotalPctTANF);
 
         if (mRecordList == null || mRecordList.size() == 0) {
             summaryRecordsTotal.setText("0");
@@ -191,7 +192,7 @@ public class SummaryActivity extends AppCompatActivity {
 
         /* Write each record to its own page */
         int i = 0;
-        for(Record record : mRecordList) {
+        for (Record record : mRecordList) {
             Log.v(TAG, "Writing record " + i);
             this.writeRecordToPage(i++, record, objDocument);
         }
@@ -213,6 +214,7 @@ public class SummaryActivity extends AppCompatActivity {
 
     /**
      * Creates a title page.
+     *
      * @return the title page.
      */
     private List<PageElement> createTitlePage() {
@@ -233,8 +235,9 @@ public class SummaryActivity extends AppCompatActivity {
 
     /**
      * Writes a page element ot its own page and adds the page to the document.
+     *
      * @param pageElements the elements to write
-     * @param objDocument the document to add the page to
+     * @param objDocument  the document to add the page to
      */
     private void writeLabelsToPage(List<PageElement> pageElements, Document objDocument) {
         // Create a page to add to the document
@@ -242,7 +245,7 @@ public class SummaryActivity extends AppCompatActivity {
                 54.0f);
 
         // Add labels to page
-        for(PageElement pageElement : pageElements) {
+        for (PageElement pageElement : pageElements) {
             objPage.getElements().add(pageElement);
         }
 
@@ -252,7 +255,8 @@ public class SummaryActivity extends AppCompatActivity {
 
     /**
      * Writes a record to a single page of a document.
-     * @param record the record to write
+     *
+     * @param record      the record to write
      * @param objDocument the document to write to.
      */
     private void writeRecordToPage(int recordNum, Record record, Document objDocument) {
@@ -269,7 +273,7 @@ public class SummaryActivity extends AppCompatActivity {
         String countyLabel = "County: ";
         String countyValue = record.getAddress();
         String numPeopleLabel = "# In Household: ";
-        String numPeopleValue = record.getNumInHousehold() +"";
+        String numPeopleValue = record.getNumInHousehold() + "";
 
         Label nameLabelLabel = new Label(nameLabel, 0, yOffset + rowIndex, 504, 100,
                 Font.getTimesBold(), 18, TextAlign.LEFT);
@@ -346,19 +350,23 @@ public class SummaryActivity extends AppCompatActivity {
     }
 
     private Template createTemplate() {
-            Template template = new Template();
+        Template template = new Template();
+        template.getElements().add(new Label(mCurrentDateandTime, 0, 0,
+                504, 12, Font.getHelveticaBold(), 12,
+                TextAlign.LEFT));
         template.getElements().add(new Label("EzSign Sign In Sheet", 0, 0,
                 504, 12, Font.getHelveticaBold(), 12,
-                     TextAlign.CENTER));
-             PageNumberingLabel pageNumLabel = new PageNumberingLabel("Page %%CP%%" +
-                     " of %%TP%%", 0, 0, 504, 12, Font.getHelveticaBold(), 12,
-                     TextAlign.RIGHT);
-             template.getElements().add(pageNumLabel);
+                TextAlign.CENTER));
+        PageNumberingLabel pageNumLabel = new PageNumberingLabel("Page %%CP%%" +
+                " of %%TP%%", 0, 0, 504, 12, Font.getHelveticaBold(), 12,
+                TextAlign.RIGHT);
+        template.getElements().add(pageNumLabel);
         return template;
     }
 
     /**
      * Handle clicking save records
+     *
      * @param v the view called.
      */
     public void onSaveRecordsClick(View v) {
@@ -394,7 +402,7 @@ public class SummaryActivity extends AppCompatActivity {
         /* Prepare and send email intent with pdf attachment */
         Intent emailIntent = new Intent(Intent.ACTION_SEND);
         emailIntent.setType("text/plain");
-        emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[] {email == null ? "<e-mail>" : email});
+        emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{email == null ? "<e-mail>" : email});
         emailIntent.putExtra(Intent.EXTRA_SUBJECT, "EzSignin Records");
         emailIntent.putExtra(Intent.EXTRA_TEXT, mRecordList.size() + " people signed in.");
         String pathToMyAttachedFile = mFilePath;
@@ -427,6 +435,8 @@ public class SummaryActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            Intent settingsActivityIntent = new Intent(this, SettingsActivity.class);
+            startActivity(settingsActivityIntent);
             return true;
         }
 

@@ -67,11 +67,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         this.initIncomeTable();
 
         /* Configure the spinnerLanguage */
-        Spinner spinnerLanguage = (Spinner) findViewById(R.id.spinnerLanguage);
-        Spinner spinnerHousehold = (Spinner) findViewById(R.id.spinnerNumHousehold);
-
-        this.configureLanguageSpinner(spinnerLanguage);
-        this.configureHouseholdSpinner(spinnerHousehold);
+        this.configureLanguageSpinner((Spinner) findViewById(R.id.spinnerLanguage));
+        this.configureHouseholdSpinner((Spinner) findViewById(R.id.spinnerNumHousehold));
 
         /* See if we're restoring a record */
         if (savedInstanceState != null) {
@@ -91,11 +88,14 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     @Override
     public void onResume() {
+        Log.v(TAG, "onResume");
+        this.initIncomeTable();
         super.onResume();
     }
 
     @Override
     public void onPause() {
+        Log.v(TAG, "onPause");
         super.onPause();
     }
 
@@ -262,12 +262,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         for (int i = 0; i < array.length; i++) {
             householdInts[i] = Integer.parseInt(array[i]);
         }
-        ArrayAdapter<Integer> adapter = new ArrayAdapter<Integer>(this, android.R.layout.simple_spinner_item, householdInts);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        ArrayAdapter<Integer> adapter = new ArrayAdapter<Integer>(this, R.layout.household_spinner, householdInts);
+        adapter.setDropDownViewResource(R.layout.house_spinner_dropdown);
         if (adapter == null) {
             Log.v(TAG, "Adapter is null!");
             return;
         }
+
         spinnerHousehold.setAdapter(adapter);
         spinnerHousehold.setOnItemSelectedListener(this);
     }
@@ -464,6 +465,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
      * @param record the record from which fields will be populated
      */
     private void populateFieldsWithRecord(Record record) {
+        Log.v(TAG, "Populating field with existing record.");
         EditText editTextName = (EditText) findViewById(R.id.editTextName);
         EditText editTextAddress = (EditText) findViewById(R.id.editTextAddress);
         EditText editTextCounty = (EditText) findViewById(R.id.editTextCounty);
@@ -477,7 +479,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         editTextName.setText(record.getName());
         editTextAddress.setText(record.getAddress());
         editTextCounty.setText(record.getCounty());
-        spinnerNumInHousehold.setSelection(record.getNumInHousehold() - 1);
+        spinnerNumInHousehold.setSelection(record.getNumInHousehold() - 1, true);
         checkBoxEligibleFS.setChecked(record.isEligibleFS());
         checkBoxEligibleIE.setChecked(record.isEligibleIE());
         checkBoxEligibleMC.setChecked(record.isEligibleMC());

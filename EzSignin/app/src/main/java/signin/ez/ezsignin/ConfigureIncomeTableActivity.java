@@ -5,8 +5,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 
@@ -27,7 +30,27 @@ public class ConfigureIncomeTableActivity extends Activity {
 
         /* Manually and gruelingly load saved income table */
         this.loadIncomeTableFromPrefs();
+    }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_configure_income_table, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        //noinspection SimplifiableIfStatement
+        int id = item.getItemId();
+
+        if (id == R.id.action_settings) {
+            Intent settingsActivityIntent = new Intent(this, SettingsActivity.class);
+            settingsActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(settingsActivityIntent);
+            return true;
+        }
+        return true;
     }
 
     private void loadIncomeTableFromPrefs() {
@@ -75,7 +98,7 @@ public class ConfigureIncomeTableActivity extends Activity {
         EditText dayConfigHH9 = (EditText)findViewById(R.id.incomeTableIncomeDayConfig9);
         EditText dayConfigHH10 = (EditText)findViewById(R.id.incomeTableIncomeDayConfig10);
 
-        String existingIncomeTableSerialized = PreferenceManager.getDefaultSharedPreferences(getBaseContext()).getString(MainActivity.KEY_PREF_INCOME_TABLE, null);
+        String existingIncomeTableSerialized = PreferenceManager.getDefaultSharedPreferences(getBaseContext()).getString(SettingsActivity.KEY_PREF_INCOME_TABLE, null);
         if (existingIncomeTableSerialized != null) {
             Log.v(TAG, "Attempting to use income table from prefs...");
             Gson gson = new Gson();
@@ -197,17 +220,22 @@ public class ConfigureIncomeTableActivity extends Activity {
         EditText dayConfigHH9 = (EditText)findViewById(R.id.incomeTableIncomeDayConfig9);
         EditText dayConfigHH10 = (EditText)findViewById(R.id.incomeTableIncomeDayConfig10);
 
-        incomeConfig.put(1, Arrays.asList(Integer.parseInt(annualConfigHH1.getText().toString().replace(",", "")), Integer.parseInt(monthlyConfigHH1.getText().toString().replace(",", "")), Integer.parseInt(weekConfigHH1.getText().toString().replace(",", "")), Integer.parseInt(dayConfigHH1.getText().toString().replace(",", ""))));
-        incomeConfig.put(2, Arrays.asList(Integer.parseInt(annualConfigHH2.getText().toString().replace(",", "")), Integer.parseInt(monthlyConfigHH2.getText().toString().replace(",", "")), Integer.parseInt(weekConfigHH2.getText().toString().replace(",", "")), Integer.parseInt(dayConfigHH2.getText().toString().replace(",", ""))));
-        incomeConfig.put(3, Arrays.asList(Integer.parseInt(annualConfigHH3.getText().toString().replace(",", "")), Integer.parseInt(monthlyConfigHH3.getText().toString().replace(",", "")), Integer.parseInt(weekConfigHH3.getText().toString().replace(",", "")), Integer.parseInt(dayConfigHH3.getText().toString().replace(",", ""))));
-        incomeConfig.put(4, Arrays.asList(Integer.parseInt(annualConfigHH4.getText().toString().replace(",", "")), Integer.parseInt(monthlyConfigHH4.getText().toString().replace(",", "")), Integer.parseInt(weekConfigHH4.getText().toString().replace(",", "")), Integer.parseInt(dayConfigHH4.getText().toString().replace(",", ""))));
-        incomeConfig.put(5, Arrays.asList(Integer.parseInt(annualConfigHH5.getText().toString().replace(",", "")), Integer.parseInt(monthlyConfigHH5.getText().toString().replace(",", "")), Integer.parseInt(weekConfigHH5.getText().toString().replace(",", "")), Integer.parseInt(dayConfigHH5.getText().toString().replace(",", ""))));
-        incomeConfig.put(6, Arrays.asList(Integer.parseInt(annualConfigHH6.getText().toString().replace(",", "")), Integer.parseInt(monthlyConfigHH6.getText().toString().replace(",", "")), Integer.parseInt(weekConfigHH6.getText().toString().replace(",", "")), Integer.parseInt(dayConfigHH6.getText().toString().replace(",", ""))));
-        incomeConfig.put(7, Arrays.asList(Integer.parseInt(annualConfigHH7.getText().toString().replace(",", "")), Integer.parseInt(monthlyConfigHH7.getText().toString().replace(",", "")), Integer.parseInt(weekConfigHH7.getText().toString().replace(",", "")), Integer.parseInt(dayConfigHH7.getText().toString().replace(",", ""))));
-        incomeConfig.put(8, Arrays.asList(Integer.parseInt(annualConfigHH8.getText().toString().replace(",", "")), Integer.parseInt(monthlyConfigHH8.getText().toString().replace(",", "")), Integer.parseInt(weekConfigHH8.getText().toString().replace(",", "")), Integer.parseInt(dayConfigHH8.getText().toString().replace(",", ""))));
-        incomeConfig.put(9, Arrays.asList(Integer.parseInt(annualConfigHH9.getText().toString().replace(",", "")), Integer.parseInt(monthlyConfigHH9.getText().toString().replace(",", "")), Integer.parseInt(weekConfigHH9.getText().toString().replace(",", "")), Integer.parseInt(dayConfigHH9.getText().toString().replace(",", ""))));
-        incomeConfig.put(10, Arrays.asList(Integer.parseInt(annualConfigHH10.getText().toString().replace(",", "")), Integer.parseInt(monthlyConfigHH10.getText().toString().replace(",", "")), Integer.parseInt(weekConfigHH10.getText().toString().replace(",", "")), Integer.parseInt(dayConfigHH10.getText().toString().replace(",", ""))));
-
+        try {
+            incomeConfig.put(1, Arrays.asList(Integer.parseInt(annualConfigHH1.getText().toString().replace(",", "")), Integer.parseInt(monthlyConfigHH1.getText().toString().replace(",", "")), Integer.parseInt(weekConfigHH1.getText().toString().replace(",", "")), Integer.parseInt(dayConfigHH1.getText().toString().replace(",", ""))));
+            incomeConfig.put(2, Arrays.asList(Integer.parseInt(annualConfigHH2.getText().toString().replace(",", "")), Integer.parseInt(monthlyConfigHH2.getText().toString().replace(",", "")), Integer.parseInt(weekConfigHH2.getText().toString().replace(",", "")), Integer.parseInt(dayConfigHH2.getText().toString().replace(",", ""))));
+            incomeConfig.put(3, Arrays.asList(Integer.parseInt(annualConfigHH3.getText().toString().replace(",", "")), Integer.parseInt(monthlyConfigHH3.getText().toString().replace(",", "")), Integer.parseInt(weekConfigHH3.getText().toString().replace(",", "")), Integer.parseInt(dayConfigHH3.getText().toString().replace(",", ""))));
+            incomeConfig.put(4, Arrays.asList(Integer.parseInt(annualConfigHH4.getText().toString().replace(",", "")), Integer.parseInt(monthlyConfigHH4.getText().toString().replace(",", "")), Integer.parseInt(weekConfigHH4.getText().toString().replace(",", "")), Integer.parseInt(dayConfigHH4.getText().toString().replace(",", ""))));
+            incomeConfig.put(5, Arrays.asList(Integer.parseInt(annualConfigHH5.getText().toString().replace(",", "")), Integer.parseInt(monthlyConfigHH5.getText().toString().replace(",", "")), Integer.parseInt(weekConfigHH5.getText().toString().replace(",", "")), Integer.parseInt(dayConfigHH5.getText().toString().replace(",", ""))));
+            incomeConfig.put(6, Arrays.asList(Integer.parseInt(annualConfigHH6.getText().toString().replace(",", "")), Integer.parseInt(monthlyConfigHH6.getText().toString().replace(",", "")), Integer.parseInt(weekConfigHH6.getText().toString().replace(",", "")), Integer.parseInt(dayConfigHH6.getText().toString().replace(",", ""))));
+            incomeConfig.put(7, Arrays.asList(Integer.parseInt(annualConfigHH7.getText().toString().replace(",", "")), Integer.parseInt(monthlyConfigHH7.getText().toString().replace(",", "")), Integer.parseInt(weekConfigHH7.getText().toString().replace(",", "")), Integer.parseInt(dayConfigHH7.getText().toString().replace(",", ""))));
+            incomeConfig.put(8, Arrays.asList(Integer.parseInt(annualConfigHH8.getText().toString().replace(",", "")), Integer.parseInt(monthlyConfigHH8.getText().toString().replace(",", "")), Integer.parseInt(weekConfigHH8.getText().toString().replace(",", "")), Integer.parseInt(dayConfigHH8.getText().toString().replace(",", ""))));
+            incomeConfig.put(9, Arrays.asList(Integer.parseInt(annualConfigHH9.getText().toString().replace(",", "")), Integer.parseInt(monthlyConfigHH9.getText().toString().replace(",", "")), Integer.parseInt(weekConfigHH9.getText().toString().replace(",", "")), Integer.parseInt(dayConfigHH9.getText().toString().replace(",", ""))));
+            incomeConfig.put(10, Arrays.asList(Integer.parseInt(annualConfigHH10.getText().toString().replace(",", "")), Integer.parseInt(monthlyConfigHH10.getText().toString().replace(",", "")), Integer.parseInt(weekConfigHH10.getText().toString().replace(",", "")), Integer.parseInt(dayConfigHH10.getText().toString().replace(",", ""))));
+        } catch (Exception e) {
+            Toast.makeText(this, "Not all entries have a value.", Toast.LENGTH_SHORT).show();
+            // TODO highlight the missing entry...!
+            return;
+        }
         /* Wrap the table and serialize the wrapper in GSON */
         Gson gson = new Gson();
         HashMapWrapper wrapper = new HashMapWrapper();
@@ -215,11 +243,8 @@ public class ConfigureIncomeTableActivity extends Activity {
         String serializedMap = gson.toJson(wrapper);
 
         /* Write the new serialized income table to prefs */
-        PreferenceManager.getDefaultSharedPreferences(getBaseContext()).edit().putString(MainActivity.KEY_PREF_INCOME_TABLE, serializedMap).commit();
+        PreferenceManager.getDefaultSharedPreferences(getBaseContext()).edit().putString(SettingsActivity.KEY_PREF_INCOME_TABLE, serializedMap).commit();
 
-        /* Put the mainactiviy back on top */
-        Intent i = new Intent(this, MainActivity.class);
-        i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(i);
+        Toast.makeText(this, "Income configuration saved.", Toast.LENGTH_SHORT).show();
     }
 }

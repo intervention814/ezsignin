@@ -5,7 +5,7 @@
     <string name="action_settings">Settings</string>
 
     <string name="prompt_name">Name</string>
-    <string name="num_people_household"># People in Household</string>
+    <string name="num_people_household"># People in Household: </string>
     <string name="income_annual">Annual</string>
     <string name="income_monthly">Monthly</string>
     <string name="income_weekly">Weekly</string>

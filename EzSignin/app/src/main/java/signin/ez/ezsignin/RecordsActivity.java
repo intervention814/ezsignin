@@ -136,7 +136,6 @@ public class RecordsActivity extends AppCompatActivity implements AdapterView.On
                 })
                 .setNegativeButton("No", null)
                 .show();
-
     }
 
     @Override
@@ -146,8 +145,8 @@ public class RecordsActivity extends AppCompatActivity implements AdapterView.On
 
         //Intent detailRecordIntent = new Intent(this, DetailRecordActivity.class);
         Intent detailRecordIntent = new Intent(this, MainActivity.class);
-        detailRecordIntent.putExtra(MainActivity.KEY_RECORD, selectedRecord);
-        detailRecordIntent.putExtra(MainActivity.KEY_MODIFY, true);
+        detailRecordIntent.putExtra(SettingsActivity.KEY_RECORD, selectedRecord);
+        detailRecordIntent.putExtra(SettingsActivity.KEY_MODIFY, true);
         startActivity(detailRecordIntent);
     }
 

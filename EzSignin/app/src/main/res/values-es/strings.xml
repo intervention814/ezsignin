@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="prompt_name">Nombre</string>
-    <string name="num_people_household"># Personas en el Hogar</string>
+    <string name="num_people_household"># Personas en el Hogar: </string>
     <string name="income_annual">Anual</string>
     <string name="income_monthly">Mensual</string>
     <string name="income_weekly">Cada semana</string>
