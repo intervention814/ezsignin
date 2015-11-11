@@ -29,8 +29,12 @@ import java.util.List;
 public class SummaryActivity extends AppCompatActivity {
 
     private final static String TAG = "SummaryActivity";
+    private final String RECORD_OUTPUT_DIR = "EzSignin";
+    private final String PDF_CREATOR = "EzSignin";
+    private final String PDF_AUTHOR = "EzSignin Author";
+
     private List<Record> mRecordList = null;
-    private String currentDateandTime = new SimpleDateFormat("MM/dd/yyyy").format(new Date());
+    private String mCurrentDateandTime = new SimpleDateFormat("MM/dd/yyyy").format(new Date());
     private String mFilePath = null;
     private Button mEmailRecordsButton = null;
 
@@ -153,8 +157,16 @@ public class SummaryActivity extends AppCompatActivity {
      * @return filePath the path to the saved doument.
      */
     private String writeRecordsToPDF() {
-        String mPdfFilePath = Environment.getExternalStorageDirectory()
-                + "/signin_sheet_" + currentDateandTime.replace("/", "_") + ".pdf";
+        String currentDateandTimeFine = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(new Date());
+        String pdfFilePath = Environment.getExternalStorageDirectory()
+                + "/" + RECORD_OUTPUT_DIR + "/signin_sheet_" + currentDateandTimeFine.replace("/", "_").replace(":", "_").replace(" ", "_") + ".pdf";
+
+        /* Make sure the directory exists. */
+        File f = new File(Environment.getExternalStorageDirectory()
+                + "/" + RECORD_OUTPUT_DIR);
+        if (!f.isDirectory()) {
+            f.mkdir();
+        }
 
         /* Start this at null */
         mFilePath = null;
@@ -167,9 +179,9 @@ public class SummaryActivity extends AppCompatActivity {
 
         /* Create a document and set it's properties */
         Document objDocument = new Document();
-        objDocument.setCreator("EzSignin");
-        objDocument.setAuthor("EzSignin Author");
-        objDocument.setTitle("Signin Sheet for " + currentDateandTime);
+        objDocument.setCreator(PDF_CREATOR);
+        objDocument.setAuthor(PDF_AUTHOR);
+        objDocument.setTitle("Signin Sheet for " + mCurrentDateandTime);
 
         /* Set the template */
         objDocument.setTemplate(this.createTemplate());
@@ -186,8 +198,8 @@ public class SummaryActivity extends AppCompatActivity {
 
         /* Write the record */
         try {
-            objDocument.draw(mPdfFilePath);
-            Toast.makeText(this, "Saved records to " + mPdfFilePath,
+            objDocument.draw(pdfFilePath);
+            Toast.makeText(this, "Saved records to " + pdfFilePath,
                     Toast.LENGTH_LONG).show();
         } catch (Exception e) {
             Toast.makeText(this,
@@ -196,7 +208,7 @@ public class SummaryActivity extends AppCompatActivity {
             return null;
         }
 
-        return mPdfFilePath;
+        return pdfFilePath;
     }
 
     /**
@@ -208,7 +220,7 @@ public class SummaryActivity extends AppCompatActivity {
         int yOffset = 30;
         Label coverLabel = new Label("EzSignin Signin Sheet", 0, yOffset,
                 504, 12, Font.getHelveticaBold(), 40, TextAlign.CENTER, RgbColor.getNavy());
-        Label coverLabel2 = new Label(currentDateandTime, 0, yOffset + 80,
+        Label coverLabel2 = new Label(mCurrentDateandTime, 0, yOffset + 80,
                 504, 12, Font.getHelveticaBold(), 30, TextAlign.CENTER, RgbColor.getBlack());
         Label coverLabel3 = new Label(mRecordList.size() + " Participants", 0, yOffset + 160,
                 504, 12, Font.getHelveticaBold(), 30, TextAlign.CENTER, RgbColor.getBlack());

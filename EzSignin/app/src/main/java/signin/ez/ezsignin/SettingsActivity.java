@@ -13,6 +13,9 @@ import android.view.MenuItem;
 
 public class SettingsActivity extends PreferenceActivity {
 
+    public final static String KEY_PREF_INCOME_TABLE = "KEY_PREF_INCOME_TABLE";
+    public final static String KEY_MODIFY = "KEY_MODIFY";
+    public final static String KEY_RECORD = "KEY_RECORD";
     public final static String KEY_PREF_EMAIL = "pref_email";
 
     public static class SettingsFragmentImpl extends PreferenceFragment {

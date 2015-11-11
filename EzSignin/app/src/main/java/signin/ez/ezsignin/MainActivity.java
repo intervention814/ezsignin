@@ -1,8 +1,6 @@
 package signin.ez.ezsignin;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
@@ -43,9 +41,7 @@ import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
-    public final static String KEY_PREF_INCOME_TABLE = "KEY_PREF_INCOME_TABLE";
-    public final static String KEY_MODIFY = "KEY_MODIFY";
-    public final static String KEY_RECORD = "KEY_RECORD";
+
     public static final String RECORDS_FILENAME = "RECORDS_FILE";
 
 
@@ -79,7 +75,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         /* See if we're restoring a record */
         if (savedInstanceState != null) {
-            Record r = (Record)savedInstanceState.get(KEY_RECORD);
+            Record r = (Record)savedInstanceState.get(SettingsActivity.KEY_RECORD);
             if (r != null) {
                 Log.v(TAG, "Restoring a record from saved instance state.");
                 this.populateFieldsWithRecord(r);
@@ -107,7 +103,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public void onSaveInstanceState(Bundle b) {
         Record currentRecord = new Record();
         this.writeFieldsToRecord(currentRecord);
-        b.putSerializable(KEY_RECORD, currentRecord);
+        b.putSerializable(SettingsActivity.KEY_RECORD, currentRecord);
     }
 
     @Override
@@ -225,9 +221,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         Record.recordId--; /* TODO this is awful, needed now to avoid id mismatch on refresh */
         Record record = new Record();
         this.writeFieldsToRecord(record);
-        refresh.putExtra(KEY_RECORD, record);
+        refresh.putExtra(SettingsActivity.KEY_RECORD, record);
         if (isModifyingRecord) {
-            refresh.putExtra(KEY_MODIFY, true);
+            refresh.putExtra(SettingsActivity.KEY_MODIFY, true);
         }
         finish();
         startActivity(refresh);
@@ -495,10 +491,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private void checkForModifyLaunch() {
         Intent i = getIntent();
         Bundle b = i.getExtras();
-        if (b != null && b.getBoolean(KEY_MODIFY)) {
+        if (b != null && b.getBoolean(SettingsActivity.KEY_MODIFY)) {
             Log.v(TAG, "Modifying!");
             isModifyingRecord = true;
-            final Record recordToModify = (Record)b.get(KEY_RECORD);
+            final Record recordToModify = (Record)b.get(SettingsActivity.KEY_RECORD);
             this.populateFieldsWithRecord(recordToModify);
             Button saveButton = (Button)findViewById(R.id.saveRecordButton);
             saveButton.setText("Modify Record: " + recordToModify.getRecordId());
@@ -519,9 +515,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     }
                 }
             });
-        } else if (b != null && b.get(KEY_RECORD) != null) {
+        } else if (b != null && b.get(SettingsActivity.KEY_RECORD) != null) {
             /* If we get here without modify, then we're just restoring a record, maybe from a language change */
-            Record restorationRecord = (Record)b.get(KEY_RECORD);
+            Record restorationRecord = (Record)b.get(SettingsActivity.KEY_RECORD);
             this.populateFieldsWithRecord(restorationRecord);
         }
     }
@@ -530,7 +526,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
      * Initialize the income table from preferences or from hardcoded defaults
      */
     private void initIncomeTable() {
-        String incomeTable = this.getPreferenceByKey(MainActivity.KEY_PREF_INCOME_TABLE);
+        String incomeTable = this.getPreferenceByKey(SettingsActivity.KEY_PREF_INCOME_TABLE);
         if (incomeTable != null) {
             Log.v(TAG, "Attempting to use new income table!");
             Gson gson = new Gson();
