@@ -97,6 +97,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             Log.v(TAG, "Restoring " + SPINNER_VALUE);
             spinner.setSelection(SPINNER_VALUE);
         }
+        // TODO this is ugly and redundant, sets us back to one...
         this.checkForModifyLaunch();
         super.onResume();
     }
