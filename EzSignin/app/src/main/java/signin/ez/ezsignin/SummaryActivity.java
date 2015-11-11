@@ -14,6 +14,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.cete.dynamicpdf.*;
+import com.cete.dynamicpdf.pageelements.Label;
+
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -23,51 +26,57 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Scanner;
 
 public class SummaryActivity extends AppCompatActivity {
 
     private final static String TAG = "SummaryActivity";
+    private static String FILE = Environment.getExternalStorageDirectory()
+            + "/HelloWorld.pdf";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_summary);
 
-        // create a new document
-        PdfDocument document = new PdfDocument();
-        PdfDocument.PageInfo pageInfo;
+        // Create a document and set it's properties
+        Document objDocument = new Document();
+        objDocument.setCreator("DynamicPDFHelloWorld.java");
+        objDocument.setAuthor("Your Name");
+        objDocument.setTitle("Hello World");
 
-        Rect rect = new Rect(0, 0, 100, 100);
-        int pageNumber = 0;
-        // crate a page description
-        pageInfo = new PdfDocument.PageInfo.Builder(100, 100, pageNumber).create();
+        // Create a page to add to the document
+        Page objPage = new Page(PageSize.LETTER, PageOrientation.PORTRAIT,
+                54.0f);
+        Page objPage2 = new Page(PageSize.LETTER, PageOrientation.PORTRAIT,
+                54.0f);
 
-        // start a page
-        PdfDocument.Page page = document.startPage(pageInfo);
+        // Create a Label to add to the page
+        String strText = "Hello World...\nFrom DynamicPDF Generator "
+                + "for Java\nDynamicPDF.com";
+        Label objLabel = new Label(strText, 0, 0, 504, 100,
+                Font.getHelvetica(), 18, TextAlign.CENTER);
 
-        // draw something on the page
-        //View content = getContentView();
-        View content = (View)findViewById(R.id.pdf_record);
-        content.draw(page.getCanvas());
+        // Add label to page
+        objPage.getElements().add(objLabel);
+        objPage2.getElements().add(objLabel);
 
-        // finish the page
-        document.finishPage(page);
-        //...
-        // add more pages
-        //...
-        // write the document content
+        // Add page to document
+        objDocument.getPages().add(objPage);
+        objDocument.getPages().add(objPage2);
+
         try {
-            File recordFile = new File("/sdcard/records.pdf");
-            document.writeTo(new FileOutputStream(recordFile));
-        } catch (IOException e) {
-            e.printStackTrace();
+            // Outputs the document to file
+            objDocument.draw(FILE);
+            Toast.makeText(this, "File has been written to :" + FILE,
+                    Toast.LENGTH_LONG).show();
+        } catch (Exception e) {
+            Toast.makeText(this,
+                    "Error, unable to write to file\n" + e.getMessage(),
+                    Toast.LENGTH_LONG).show();
         }
-
-        // close the document
-        document.close();
-
-        Toast.makeText(this, "Wrote PDF.", Toast.LENGTH_SHORT).show();
     }
 
 
