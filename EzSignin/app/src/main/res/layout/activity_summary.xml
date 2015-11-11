@@ -80,8 +80,20 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Save Records"
-                android:id="@+id/button"
+                android:id="@+id/buttonSaveRecords"
                 android:onClick="onSaveRecordsClick"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="2dp"/>
+        </TableRow>
+        <TableRow
+            android:gravity="center_horizontal">
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Email Records"
+                android:enabled="false"
+                android:id="@+id/buttonEmailRecords"
+                android:onClick="onEmailRecordsClick"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="2dp"/>
         </TableRow>

@@ -56,7 +56,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private boolean mIsAdapterSetSelectionLanguage = true;
     private final static String VALUE_LANG_SPANISH = "VALUE_LANG_SPANISH";
     private final static String VALUE_LANG_ENGLISH = "VALUE_LANG_ENGLISH";
-    private String mEmail = "";
 
     private static String CURRENT_LANGUAGE = VALUE_LANG_ENGLISH;
 
@@ -68,9 +67,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
-
-        /* Retreive the cached email */
-        mEmail = this.getPreferenceByKey(SettingsActivity.KEY_PREF_EMAIL);
 
         this.initIncomeTable();
 

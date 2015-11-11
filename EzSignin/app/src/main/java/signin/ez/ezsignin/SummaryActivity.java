@@ -1,13 +1,17 @@
 package signin.ez.ezsignin;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -15,12 +19,8 @@ import com.cete.dynamicpdf.*;
 import com.cete.dynamicpdf.pageelements.Label;
 import com.cete.dynamicpdf.pageelements.Line;
 import com.cete.dynamicpdf.pageelements.PageNumberingLabel;
-import com.cete.dynamicpdf.pageelements.Row2;
-import com.cete.dynamicpdf.pageelements.Table2;
-import com.cete.dynamicpdf.pageelements.UnorderedSubList;
-import com.cete.dynamicpdf.pageelements.forms.CheckBox;
 
-import java.sql.ResultSet;
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -31,11 +31,17 @@ public class SummaryActivity extends AppCompatActivity {
     private final static String TAG = "SummaryActivity";
     private List<Record> mRecordList = null;
     private String currentDateandTime = new SimpleDateFormat("MM/dd/yyyy").format(new Date());
+    private String mFilePath = null;
+    private Button mEmailRecordsButton = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_summary);
+
+        /* Get a reference to the email records button */
+        mEmailRecordsButton = (Button)findViewById(R.id.buttonEmailRecords);
+        mEmailRecordsButton.setEnabled(false);
 
         /* Get the records from the file */
         mRecordList = MainActivity.readRecords(getBaseContext());
@@ -147,9 +153,11 @@ public class SummaryActivity extends AppCompatActivity {
      * @return filePath the path to the saved doument.
      */
     private String writeRecordsToPDF() {
-
         String mPdfFilePath = Environment.getExternalStorageDirectory()
                 + "/signin_sheet_" + currentDateandTime.replace("/", "_") + ".pdf";
+
+        /* Start this at null */
+        mFilePath = null;
 
         /* Make sure we have records to write. */
         if (mRecordList == null || mRecordList.size() == 0) {
@@ -334,13 +342,6 @@ public class SummaryActivity extends AppCompatActivity {
                      " of %%TP%%", 0, 0, 504, 12, Font.getHelveticaBold(), 12,
                      TextAlign.RIGHT);
              template.getElements().add(pageNumLabel);
-//             template.getElements().add(new Label("Product", 2, 23, 236, 11,
-//                     Font.getTimesBold(), 11));
-//             template.getElements().add(new Label("Qty Per Unit", 242, 23, 156, 11,
-//                     Font.getTimesBold(), 11));
-//             template.getElements().add(new Label("Unit Price", 402, 23, 100, 11,
-//                     Font.getTimesBold(), 11, TextAlign.RIGHT));
-//             template.getElements().add(new Line(0, 36, 504, 36));
         return template;
     }
 
@@ -349,13 +350,53 @@ public class SummaryActivity extends AppCompatActivity {
      * @param v the view called.
      */
     public void onSaveRecordsClick(View v) {
-        String filePath = this.writeRecordsToPDF();
+        mFilePath = this.writeRecordsToPDF();
 
-        /* Make sure we got a path */
-        if (filePath == null) {
-            Log.v(TAG, "Path null, not sending email.");
+        /* If we wrote a file, we can now email it! */
+        if (mFilePath != null) {
+            mEmailRecordsButton.setEnabled(true);
+        } else {
+            mEmailRecordsButton.setEnabled(false);
+        }
+    }
+
+    /**
+     * Handle clicking the email-records button.
+     *
+     * @param v the view clicked on
+     */
+    public void onEmailRecordsClick(View v) {
+        if (mRecordList == null || mRecordList.size() == 0 || mFilePath == null) {
             return;
         }
+
+        /* Retrieve the cached email */
+        String email = null;
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        try {
+            email = sharedPref.getString(SettingsActivity.KEY_PREF_EMAIL, null);
+        } catch (NumberFormatException nfe) {
+            Log.v(TAG, nfe.getMessage());
+        }
+
+        /* Prepare and send email intent with pdf attachment */
+        Intent emailIntent = new Intent(Intent.ACTION_SEND);
+        emailIntent.setType("text/plain");
+        emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[] {email == null ? "<e-mail>" : email});
+        emailIntent.putExtra(Intent.EXTRA_SUBJECT, "EzSignin Records");
+        emailIntent.putExtra(Intent.EXTRA_TEXT, mRecordList.size() + " people signed in.");
+        String pathToMyAttachedFile = mFilePath;
+
+        File file = new File(pathToMyAttachedFile);
+
+        if (!file.exists() || !file.canRead()) {
+            Log.v(TAG, "Problem getting file.");
+            return;
+        }
+
+        Uri uri = Uri.fromFile(file);
+        emailIntent.putExtra(Intent.EXTRA_STREAM, uri);
+        startActivity(Intent.createChooser(emailIntent, "Pick an Email provider"));
     }
 
     @Override
